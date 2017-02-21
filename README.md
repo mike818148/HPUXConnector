@@ -79,7 +79,7 @@ Origin author: Mikg Chung, Gamatech Ltd.
 
 ## License
 
-This project is licensed under the Gamatech Ltd. Hong Kong - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the Gamatech Ltd. Hong Kong - using MIT License see the [LICENSE.md](LICENSE.md) file for details
 
 ## Acknowledgments
 
