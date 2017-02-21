@@ -1,0 +1,231 @@
+<!DOCTYPE html PUBLIC
+                "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<!-- (c) Copyright 2008 SailPoint Technologies, Inc., All Rights Reserved. -->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:t="http://myfaces.apache.org/tomahawk"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:sp="http://sailpoint.com/ui">
+<body>
+
+<ui:composition>
+
+    <script type="text/javascript">
+    <!--//--><![CDATA[//><!--
+        helpKey = 'APPLICATION';
+
+        function getFieldValue(field) {
+            var val = null;
+            var fileName = $(field);
+            if ( fileName ) {
+                val = fileName.value;
+            }
+            return val;
+        }
+        Ext.onReady(function () {
+            Ext.QuickTips.init();
+
+            // This is our validation hook
+            Page.on('beforeSave', function() {
+
+                var domain = getFieldValue('editForm:host');
+                Validator.validateNonBlankString(domain, "#{msgs.con_form_unix_hostnotnull}");
+                var sshport = getFieldValue('editForm:SshPort');
+                Validator.validateNonBlankString(sshport, "#{msgs.con_form_unix_sshnotnull}");
+                var user = getFieldValue('editForm:SudoUser');
+                Validator.validateNonBlankString(user, "#{msgs.con_form_unix_usernotnull}");
+                var passwd = getFieldValue('editForm:SudoUserPassword');
+                Validator.validateNonBlankString(passwd, "#{msgs.con_form_unix_pswdnotnull}");		
+
+                var errors = Validator.getErrors();
+                if (errors && errors.length > 0) {
+                    var errorDivTop = $('appErrorsTop');
+
+
+                    Validator.displayErrors(errorDivTop); 
+                    return false;
+                }
+                //return false will kill cancel the save
+                return true;
+            });
+        });
+
+    //--><!]]>
+    </script>
+    <f:view>
+
+        <h:outputText styleClass="sectionHeader" value="#{msgs.con_form_unix_consetting}"/><br/><br/>
+
+
+        <div id="accountSettings" class='spContent'>
+        <table class="spTable" style="border:0px" cellspacing="0">
+            <tr>
+                <td class='titleColumn certScheduleTitleCol' valign="center">
+                    <h:outputText style='padding:5px' value="#{msgs.con_form_unix_host}"/>
+                    <h:outputText styleClass="requiredText" value="*"/>
+                </td>
+                <td class="certScheduleHelpCol" valign="middle">
+                    <h:graphicImage id="imgHlpHostName" styleClass="helpIcon" url="/images/icons/dashboard_help_16.png" 
+                                alt="#{msgs.help_con_form_unix_hostname}"/>
+                </td>
+                <td valign="center">
+                    <h:inputText id="host"
+                                value="#{applicationObject.attributes['host']}"
+                                redisplay="true"
+                                size="80"
+                                requiredMessage="#{msgs.help_con_form_unix_hostname}"
+                                disabled="#{!sp:hasRight(facesContext, 'ManageApplication')}"
+                                readonly="#{!sp:hasRight(facesContext, 'ManageApplication')}"/>
+                </td>
+            </tr>
+            <tr>
+                <td class='titleColumn certScheduleTitleCol' >
+                    <h:outputText style='padding:5px' value="#{msgs.con_form_unix_ssh}"/>
+                    <h:outputText styleClass="requiredText" value="*"/>
+                </td>
+                <td class="certScheduleHelpCol" valign="middle">
+                    <h:graphicImage id="imgHlpsshport" styleClass="helpIcon" url="/images/icons/dashboard_help_16.png" 
+                                alt="#{msgs.help_con_form_unix_ssh}"/>
+                </td>
+                <td valign="center">
+                    <h:inputText id="SshPort"
+                            value="#{applicationObject.attributes['SshPort']}"
+                            redisplay="true"
+                            size="80"
+                            requiredMessage="#{msgs.help_con_form_unix_ssh}"
+                            disabled="#{!sp:hasRight(facesContext, 'ManageApplication')}"
+                            readonly="#{!sp:hasRight(facesContext, 'ManageApplication')}"/>
+                </td>
+            </tr>
+            <tr>
+                <td class='titleColumn certScheduleTitleCol' valign="center">
+                    <h:outputText style='padding:5px' value="#{msgs.con_form_unix_user}"/>
+                    <h:outputText styleClass="requiredText" value="*"/>
+                </td>
+                <td class="certScheduleHelpCol" valign="middle">
+                    <h:graphicImage id="imgHlpUserName" styleClass="helpIcon" url="/images/icons/dashboard_help_16.png" 
+                                alt="#{msgs.help_con_form_unix_username}"/>
+                </td>
+                <td valign="center">
+                    <h:inputText id="SudoUser"
+                                value="#{applicationObject.attributes['SudoUser']}"
+                                redisplay="true"
+                                size="80"
+                                requiredMessage="#{msgs.help_con_form_unix_username}"
+                                disabled="#{!sp:hasRight(facesContext, 'ManageApplication')}"
+                                readonly="#{!sp:hasRight(facesContext, 'ManageApplication')}"/>
+                </td>
+            </tr>
+            <tr>
+                <td class='titleColumn certScheduleTitleCol' valign="center">
+                    <h:outputText style='padding:5px' value="#{msgs.con_form_unix_password}"/>
+                    <h:outputText styleClass="requiredText" value="*"/>
+                </td>
+                <td class="certScheduleHelpCol" valign="middle">
+                    <h:graphicImage id="imgHlpUsrPasswd" styleClass="helpIcon" url="/images/icons/dashboard_help_16.png" 
+                                alt="#{msgs.help_con_form_unix_password}"/>
+                </td>
+                <td valign="center">
+                    <sp:inputSecret id="SudoUserPassword"
+                            value="#{applicationObject.attributes['SudoUserPassword']}"
+                            redisplay="true"
+                            size="80" autocomplete="off"
+                            requiredMessage="#{msgs.help_con_form_unix_password}"
+                            disabled="#{!sp:hasRight(facesContext, 'ManageApplication')}"
+                            readonly="#{!sp:hasRight(facesContext, 'ManageApplication')}"/>
+                </td>
+            </tr>
+            <tr>
+                <td class='titleColumn certScheduleTitleCol' valign="center">
+                    <h:outputText style='padding:5px' value="#{msgs.con_form_unix_notroot}"/>
+                </td>
+                <td class="certScheduleHelpCol" valign="middle">
+                    <h:graphicImage id="imgHlpIsSudoUsr" styleClass="helpIcon" url="/images/icons/dashboard_help_16.png" 
+                                alt="#{msgs.help_con_form_unix_root}"/>
+                </td>
+                <td valign="center">
+                    <h:selectBooleanCheckbox id="IsSudoUser"
+                                value="#{applicationObject.attributes['IsSudoUser']}"
+                                requiredMessage="#{msgs.help_con_form_unix_root}"
+                                disabled="#{!sp:hasRight(facesContext, 'ManageApplication')}"/>
+                </td>
+            </tr>
+                <tr>
+                <td class='titleColumn certScheduleTitleCol' valign="center">
+                    <h:outputText style='padding:5px' value="#{msgs.con_form_unix_keypath}"/>
+                </td>
+                <td class="certScheduleHelpCol" valign="middle">
+                    <h:graphicImage id="imgHlpPrivateKey" styleClass="helpIcon" url="/images/icons/dashboard_help_16.png" 
+                                alt="#{msgs.help_con_form_unix_keypath}"/>
+                </td>
+                <td valign="center">
+                  <h:inputText id="PrivateKeyFilePath"
+                            value="#{applicationObject.attributes['PrivateKeyFilePath']}"
+                            redisplay="true"
+                            size="80"
+                            requiredMessage="#{msgs.help_con_form_unix_privatekey}"
+                            disabled="#{!sp:hasRight(facesContext, 'ManageApplication')}"
+                            readonly="#{!sp:hasRight(facesContext, 'ManageApplication')}" />
+                </td>
+            </tr>
+            <tr>
+                <td class='titleColumn certScheduleTitleCol' valign="center">
+                    <h:outputText style='padding:5px' value="#{msgs.con_form_unix_passphrase}"/>
+                </td>
+                <td class="certScheduleHelpCol" valign="middle">
+                    <h:graphicImage id="imgHlpKeyPassphrase" styleClass="helpIcon" url="/images/icons/dashboard_help_16.png" 
+                                alt="#{msgs.help_con_form_unix_passphrase}"/>
+                </td>
+                <td valign="center">
+                  <sp:inputSecret id="PassphraseForPrivateKey"
+                            value="#{applicationObject.attributes['PassphraseForPrivateKey']}"
+                            redisplay="true"
+                            size="80"
+                            requiredMessage="#{msgs.help_con_form_unix_passphrase}"
+                            disabled="#{!sp:hasRight(facesContext, 'ManageApplication')}"
+                            readonly="#{!sp:hasRight(facesContext, 'ManageApplication')}" />
+                </td>
+            </tr> 
+ 	    <tr>
+                <td class='titleColumn certScheduleTitleCol' valign="center">
+                    <h:outputText style='padding:5px' value="Has Shadow File?"/>
+                </td>
+                <td class="certScheduleHelpCol" valign="middle">
+                    <h:graphicImage id="imgHlpHasShadowFile" styleClass="helpIcon" url="/images/icons/dashboard_help_16.png"
+                                alt="If system has /etc/shadow file?"/>
+                </td>
+                <td valign="center">
+                    <h:selectBooleanCheckbox id="hasShadowFile"
+                                value="#{applicationObject.attributes['hasShadowFile']}"
+                                requiredMessage="#{msgs.help_con_form_unix_root}"
+                                disabled="#{!sp:hasRight(facesContext, 'ManageApplication')}"/>
+                </td>
+            </tr>
+	    <tr>
+                <td class='titleColumn certScheduleTitleCol' valign="center">
+                    <h:outputText style='padding:5px' value="Trusted mode?"/>
+                </td>
+                <td class="certScheduleHelpCol" valign="middle">
+                    <h:graphicImage id="imgHlpIsTrusted" styleClass="helpIcon" url="/images/icons/dashboard_help_16.png"
+                                alt="If system is Trusted mode?"/>
+                </td>
+                <td valign="center">
+                    <h:selectBooleanCheckbox id="isTrusted"
+                                value="#{applicationObject.attributes['isTrusted']}"
+                                requiredMessage="#{msgs.help_con_form_unix_root}"
+                                disabled="#{!sp:hasRight(facesContext, 'ManageApplication')}"/>
+                </td>
+            </tr> 
+        </table>
+        </div>
+
+    </f:view>
+</ui:composition>
+
+</body>
+</html>

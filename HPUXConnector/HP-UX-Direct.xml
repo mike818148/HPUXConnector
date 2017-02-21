@@ -1,0 +1,584 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE sailpoint PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<sailpoint>
+<ImportAction name="merge">
+<Configuration name="ConnectorRegistry">
+<Attributes>
+ <Map>
+   <entry key="applicationTemplates">
+   <value>
+   <List>
+<Application connector="sailpoint.connector.OpenConnectorAdapter" featuresString="PROVISIONING, SYNC_PROVISIONING, ENABLE, UNLOCK, SEARCH, UNSTRUCTURED_TARGETS, PASSWORD, CURRENT_PASSWORD, ACCOUNT_ONLY_REQUEST" icon="enterpriseIcon" name="HPUXTest" type="HPUX - Direct">
+  <Attributes>
+    <Map>
+	  <entry key="isexists.account" value="getent passwd"/>
+	  <entry key="formPath" value="HPUXAttributesForm.xhtml"/>
+      <entry key="GroupDBFormat">
+        <value>
+          <List>
+            <String>name</String>
+            <String>password</String>
+            <String>groupid</String>
+            <String>memberlist</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="IsSudoUser">
+        <value>
+          <Boolean>false</Boolean>
+        </value>
+      </entry>
+      <entry key="PassphraseForPrivateKey"/>
+      <entry key="PasswdBasicErrors">
+        <value>
+          <Map>
+            <entry key="passwd: Only root can specify a user name." value="passwd: Only root can specify a user name."/>
+            <entry key="paswd: Command not found." value="paswd: Command not found."/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="PasswdErrors">
+        <value>
+          <Map>
+            <entry key="BAD PASSWORD: is too similar to the old one" value="BAD PASSWORD: Password is too similar to the old one."/>
+            <entry key="BAD PASSWORD: it is based on a dictionary word" value="BAD PASSWORD: Password is based on a dictionary word."/>
+            <entry key="Error changing password" value="Error changing password."/>
+            <entry key="Sorry, passwords do not match." value="Passwords do not match."/>
+            <entry key="Sorry, try again." value="Invalid sudo user password."/>
+            <entry key="is not in the sudoers file.  This incident will be reported." value="sudo user not configured."/>
+            <entry key="passwd: Authentication token manipulation error" value="Invalid current user password."/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="PasswdPrompts">
+        <value>
+			<Map>
+			  <entry key="(current) UNIX password:" value="CurrentPassword"/>
+			  <entry key="Old Password:" value="CurrentPassword"/>
+			  <entry key="New password:" value="NewPassword"/>
+			  <entry key="Retype new password:" value="NewPassword"/>
+			  <entry key="Reenter New Password:" value="NewPassword"/>
+			  <entry key="Re-enter new Password:" value="NewPassword"/>
+			</Map>
+        </value>
+      </entry>
+      <entry key="PasswdSuccess">
+        <value>
+          <List>
+            <String>passwd: all authentication tokens updated successfully.</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="PrivateKeyFilePath"/>
+      <entry key="Prompt" value="SAILPOINT>"/>
+      <entry key="PwdDBFormat">
+        <value>
+          <List>
+            <String>username</String>
+            <String>password</String>
+            <String>uid</String>
+            <String>primgrp</String>
+            <String>comment</String>
+            <String>home</String>
+            <String>shell</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="SSHLoginTimeout" value="1000"/>
+      <entry key="SetPrompt" value="PS1=&apos;SAILPOINT>&apos;"/>
+      <entry key="ShadowDBFormat">
+        <value>
+          <List>
+            <String>username</String>
+            <String>password</String>
+            <String>pwdlastchg</String>
+            <String>pwdmin</String>
+            <String>pwdmax</String>
+            <String>pwdwarn</String>
+            <String>inactive</String>
+            <String>expiration</String>
+            <String>keyword1</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="SshPort" value="22"/>
+      <entry key="SudoBasicError" value="sudo: Command not found."/>
+      <entry key="SudoBasicErrorCode" value="127"/>
+      <entry key="SudoError" value="Sorry, try again."/>
+      <entry key="SudoErrorCode" value="1"/>
+      <entry key="SudoUser" value="usert01"/>
+      <entry key="SudoUserPassword" value="1:+rujZPK3O32hnyr7pR9vFw=="/>
+      <entry key="aggregation.account" value="cat /etc/passwd | grep -v &apos;^+&apos; | grep -v &apos;^-&apos;"/>
+      <entry key="aggregation.group" value="cat /etc/group | grep -v &apos;^+&apos; | grep -v &apos;^-&apos;"/>
+      <entry key="aggregation.lockstatus" value="userstat"/>
+      <entry key="aggregation.passwd" value="cat /etc/shadow | grep -v &apos;^+&apos; | grep -v &apos;^-&apos;"/>
+      <entry key="change.password" value="passwd"/>
+      <entry key="changepassword.resetmode" value="passwd -f"/>
+      <entry key="chmod g-">
+        <value>
+          <Map>
+            <entry key="flags">
+              <value>
+                <Map>
+                  <entry key="execute" value="x"/>
+                  <entry key="read" value="r"/>
+                  <entry key="write" value="w"/>
+                </Map>
+              </value>
+            </entry>
+          </Map>
+        </value>
+      </entry>
+      <entry key="chmod u-">
+        <value>
+          <Map>
+            <entry key="flags">
+              <value>
+                <Map>
+                  <entry key="execute" value="x"/>
+                  <entry key="read" value="r"/>
+                  <entry key="write" value="w"/>
+                </Map>
+              </value>
+            </entry>
+          </Map>
+        </value>
+      </entry>
+      <entry key="compositeDefinition"/>
+      <entry key="connect" value="ssh"/>
+      <entry key="connectorClass" value="openconnector.HPUXConnector"/>
+      <entry key="create.account" value="useradd"/>
+      <entry key="create.group" value="groupadd"/>
+      <entry key="delete.account" value="userdel"/>
+      <entry key="delete.group" value="groupdel"/>
+      <entry key="disable.account" value="passwd -l"/>
+	  <entry key="disable.account.trusted" value="/usr/lbin/modprpw -k"/>
+      <entry key="echo &apos;TestConnection&apos;">
+        <value>
+          <Map>
+            <entry key="exitsts">
+              <value>
+                <Map>
+                  <entry key="Success" value="TestConnection"/>
+                </Map>
+              </value>
+            </entry>
+          </Map>
+        </value>
+      </entry>
+      <entry key="enable.account" value="passwd -d"/>
+	  <entry key="enable.account.trusted" value="/usr/lbin/modprpw -k"/>
+      <entry key="encrypted" value="SudoUserPassword,PassphraseForPrivateKey"/>
+      <!--entry key="get.loginsyslimit" value="cat /etc/pam.d/system-auth"/ HPUX no such file-->
+      <entry key="get.oldaccountval" value="groups"/>
+      <!--entry key="get.userfailedlogin" value="faillog"/-->
+      <entry key="get.userpwdrow" value="cat /etc/passwd | grep"/>
+      <entry key="get.usershadowrow" value="cat /etc/shadow | grep"/>
+      <entry key="groupadd">
+        <value>
+          <Map>
+            <entry key="exitsts">
+              <value>
+                <Map>
+                  <entry key="10" value="The /etc/group file cannot be updated."/>
+                  <entry key="2" value="Invalid command syntax. A usage message for the groupadd command is displayed."/>
+                  <entry key="3" value="An invalid argument was provided to an option."/>
+                  <entry key="4" value="The gid is not unique (when -o option is not used)."/>
+                  <entry key="9" value="The group is not unique."/>
+                </Map>
+              </value>
+            </entry>
+            <entry key="flags">
+              <value>
+                <Map>
+                  <entry key="dupgid" value="-o"/>
+                  <entry key="groupid" value="-g"/>
+                </Map>
+              </value>
+            </entry>
+          </Map>
+        </value>
+      </entry>
+      <entry key="groupdel">
+        <value>
+          <Map>
+            <entry key="exitsts">
+              <value>
+                <Map>
+                  <entry key="10" value="Cannot update the /etc/group file."/>
+                  <entry key="2" value="Invalid command syntax. A usage message for the groupdel command is displayed."/>
+                  <entry key="6" value="group does not exist."/>
+                </Map>
+              </value>
+            </entry>
+            <entry key="flags"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="groupmod">
+        <value>
+          <Map>
+            <entry key="exitsts">
+              <value>
+                <Map>
+                  <entry key="10" value="Cannot update the /etc/group file."/>
+                  <entry key="2" value="Invalid command syntax. A usage message for the groupmod command is displayed."/>
+                  <entry key="3" value="An invalid argument was provided to an option."/>
+                  <entry key="4" value="gid is not unique (when the -o option is not used)."/>
+                  <entry key="6" value="group does not exist."/>
+                  <entry key="9" value="name already exists as a group name."/>
+                </Map>
+              </value>
+            </entry>
+            <entry key="flags">
+              <value>
+                <Map>
+                  <entry key="dupgid" value="-o"/>
+                  <entry key="groupid" value="-g"/>
+                  <entry key="newgroupname" value="-n"/>
+                </Map>
+              </value>
+            </entry>
+          </Map>
+        </value>
+      </entry>
+      <entry key="host" value="192.168.232.129"/>
+      <entry key="interactiveSetPassword" value="true"/>
+      <entry key="modify.account" value="usermod"/>
+      <entry key="modify.group" value="groupmod"/>
+      <entry key="nativeChangeDetectionAttributeScope" value="entitlements"/>
+      <entry key="nativeChangeDetectionAttributes"/>
+      <entry key="nativeChangeDetectionEnabled">
+        <value>
+          <Boolean></Boolean>
+        </value>
+      </entry>
+      <entry key="nativeChangeDetectionOperations"/>
+      <entry key="passwd">
+        <value>
+          <Map>
+            <entry key="exitsts">
+              <value>
+                <Map>
+                  <entry key="1" value="Permission denied."/>
+                  <entry key="10" value="Account expired."/>
+                  <entry key="11" value="Password information unchanged."/>
+                  <entry key="2" value="Invalid combination of options."/>
+                  <entry key="3" value="Unexpected failure. Password file unchanged."/>
+                  <entry key="4" value="Unexpected failure. Password file(s) missing."/>
+                  <entry key="5" value="Password file(s) busy. Try again later."/>
+                  <entry key="6" value="Invalid argument to option."/>
+                  <entry key="7" value="Aging option is disabled."/>
+                  <entry key="8" value="No memory."/>
+                  <entry key="9" value="System error."/>
+                </Map>
+              </value>
+            </entry>
+            <entry key="flags">
+              <value>
+                <Map>
+                  <entry key="forcepwdchg" value="-f"/>
+                  <entry key="pwdmax" value="-x"/>
+                  <entry key="pwdmin" value="-n"/>
+                  <entry key="pwdwarn" value="-w"/>
+                  <entry key="unlock" value="-d"/>
+                </Map>
+              </value>
+            </entry>
+          </Map>
+        </value>
+      </entry>
+      <entry key="remove.account.permission" value="chmod u-"/>
+      <entry key="remove.group.permission" value="chmod g-"/>
+      <entry key="remove.remotefile" value="\rm -f"/>
+      <entry key="retryableErrors">
+        <value>
+          <List>
+            <String>Login failed</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="setDelay" value="1"/>
+      <entry key="sshTimeOut" value="120000"/>
+      <entry key="sshWaitTime" value="500"/>
+      <entry key="sysDescriptions">
+        <value>
+          <Map>
+            <entry key="en_US"/>
+          </Map>
+        </value>
+      </entry>
+      <entry key="templateApplication" value="HPUX - Direct"/>
+      <entry key="testconnection" value="echo &apos;TestConnection&apos;"/>
+      <entry key="unlock.account" value="userdbset -d -u"/>
+      <entry key="useradd">
+        <value>
+          <Map>
+            <entry key="exitsts">
+              <value>
+                <Map>
+                  <entry key="10" value="Cannot modify the /etc/group file. The login was added to the /etc/passwd file, but not to the /etc/group file."/>
+                  <entry key="12" value="Unable to create the home directory (while using the -m option) or unable to complete the copy of skel_dir to the new home directory."/>
+                  <entry key="13" value="Unable to open /etc/ptmp file or /etc/default file, or /etc/passwd file is non-existent."/>
+                  <entry key="14" value="/etc/passwd, or /etc/ptmp, or /etc/default file busy. Another command may be modifying the /etc/passwd file."/>
+                  <entry key="16" value="Cannot add the entry into the /etc/passwd file."/>
+                  <entry key="2" value="Invaid command syntax."/>
+                  <entry key="3" value="Invalid argument supplied to an option."/>
+                  <entry key="4" value="uid is not unique (when -o is not used)."/>
+                  <entry key="6" value="The group specified with the -g option does not exist."/>
+                  <entry key="9" value="login is not unique."/>
+                </Map>
+              </value>
+            </entry>
+            <entry key="flags">
+              <value>
+                <Map>
+				  <entry key="uid" value="-u"/>
+				  <entry key="dupuid" value="-o"/>
+				  <entry key="primgrp" value="-g"/>
+				  <entry key="groups" value="-G"/>
+				  <entry key="home" value="-d"/>
+				  <entry key="shell" value="-s"/>
+                  <entry key="comment" value="-c"/>
+                  <entry key="crthomedir" value="-m"/>
+                  <entry key="skel_dir" value="-k"/>
+				  <entry key="inactive" value="-f"/>
+                  <entry key="expiration" value="-e"/>
+                  <entry key="base_dir" value="-b"/>       
+                </Map>
+              </value>
+            </entry>
+          </Map>
+        </value>
+      </entry>
+      <entry key="userdel">
+        <value>
+          <Map>
+            <entry key="exitsts">
+              <value>
+                <Map>
+                  <entry key="2" value="Invalid command syntax."/>
+				  <entry key="3" value="Invalid argument supplied to an option."/>
+				  <entry key="6" value="The login to be removed does not exist."/>
+				  <entry key="8" value="The login to be removed is in use."/>
+				  <entry key="10" value="Cannot modify the /etc/group file, but the login was removed from the /etc/passwd file."/>
+				  <entry key="12" value="Unable to remove or modify the home directory."/>
+				  <entry key="13" value="Unable to open /etc/ptmp file or /etc/passwd file is non-existent."/>
+				  <entry key="14" value="/etc/passwd file or /etc/ptmp file busy. Another command may be modifying the /etc/passwd file."/>
+				  <entry key="17" value="Cannot delete entry from /etc/passwd file."/>
+                  <entry key="18" value="Out of memory."/>
+                  <entry key="19" value="Invalid template file."/>
+                </Map>
+              </value>
+            </entry>
+            <entry key="flags">
+              <value>
+                <Map>
+                  <entry key="removeHome" value="-r"/>
+				  <entry key="force" value="-F"/>
+                </Map>
+              </value>
+            </entry>
+          </Map>
+        </value>
+      </entry>
+      <entry key="usermod">
+        <value>
+          <Map>
+            <entry key="exitsts">
+              <value>
+                <Map>
+                  <entry key="2" value="Invalid command syntax."/>
+                  <entry key="3" value="Invalid argument supplied to an option."/>
+                  <entry key="4" value="uid is not unique (when -o is not used)."/>
+                  <entry key="6" value="The login to be modified or the group specified with the -g option does not exist."/>
+                  <entry key="8" value="The login to be modified is in use."/>
+                  <entry key="9" value="new_logname is not unique."/>
+                  <entry key="10" value="Cannot modify the /etc/group file. The other parts of the update request will be performed."/>
+                  <entry key="11" value="There is insufficient space to move the home directory (with the -m option). The other parts of the update request will be performed."/>
+                  <entry key="12" value="Unable to complete the move of the home directory to the new home directory."/>
+                  <entry key="13" value="Unable to open /etc/ptmp file, or /etc/passwd file is non-existent."/>
+				  <entry key="14" value="/etc/passwd file or /etc/ptmp file busy. Another command may be modifying the /etc/passwd file."/>
+				  <entry key="15" value="Cannot modify the entry in the /etc/passwd file."/>
+				  <entry key="18" value="Out of memory."/>
+				  <entry key="19" value="Invalid template file."/>
+				  <entry key="54" value="Exceeding permissible limit of maximum members in a group. The /etc/group file is not modified."/>
+                </Map>
+              </value>
+            </entry>
+            <entry key="flags">
+              <value>
+                <Map>
+				  <entry key="uid" value="-u"/>
+				  <entry key="dupuid" value="-o"/>
+				  <entry key="primgrp" value="-g"/>
+				  <entry key="groups" value="-G"/>
+				  <entry key="home" value="-d"/>
+				  <entry key="crthomedir" value="-m"/>
+                  <entry key="shell" value="-s"/>
+				  <entry key="comment" value="-c"/>
+				  <entry key="inactive" value="-f"/>
+                  <entry key="new_logname" value="-l"/>
+                  <entry key="expiration" value="-e"/>
+                  <entry key="encrypted_password" value="-p"/>
+                  <entry key="force" value="-F"/>
+                </Map>
+              </value>
+            </entry>
+          </Map>
+        </value>
+      </entry>
+	  <entry key="/usr/lbin/modprpw -k">
+        <value>
+          <Map>
+            <entry key="exitsts">
+              <value>
+                <Map>
+                  <entry key="1" value="User not privileged."/>
+                  <entry key="2" value="Incorrect usage."/>
+                  <entry key="3" value="Can not find the entry or file."/>
+                  <entry key="4" value="Can not change the entry."/>
+                  <entry key="5" value="Not a Trusted System."/>
+                  <entry key="6" value="Not a NIS+ user."/>
+                </Map>
+              </value>
+            </entry>
+          </Map>
+        </value>
+      </entry>
+	  <entry key="/usr/lbin/modprpw -e">
+        <value>
+          <Map>
+            <entry key="exitsts">
+              <value>
+                <Map>
+                  <entry key="1" value="User not privileged."/>
+                  <entry key="2" value="Incorrect usage."/>
+                  <entry key="3" value="Can not find the entry or file."/>
+                  <entry key="4" value="Can not change the entry."/>
+                  <entry key="5" value="Not a Trusted System."/>
+                  <entry key="6" value="Not a NIS+ user."/>
+                </Map>
+              </value>
+            </entry>
+          </Map>
+        </value>
+      </entry>
+	  <entry key="userdbset -d -u">
+        <value>
+          <Map>
+            <entry key="exitsts">
+              <value>
+                <Map>
+                  <entry key="1" value="invalid user"/>
+                  <entry key="2" value="invalid usage"/>
+                  <entry key="3" value="insufficient permission to access the user database"/>
+                  <entry key="4" value="file system error"/>
+                  <entry key="5" value="invalid attribute; /etc/security.dsc does not allow a per-user value"/>
+                  <entry key="6" value="an attribute value is not within the range specified in /etc/security.dsc"/>
+				  <entry key="7" value="block overflow"/>
+                  <entry key="8" value="entry overflow"/>
+                  <entry key="9" value="database lock failure"/>
+                  <entry key="10" value="database is disabled; see userdb(4)"/>
+                  <entry key="11" value="invalid user name"/>
+                  <entry key="12" value="not a local user"/>
+                </Map>
+              </value>
+            </entry>
+          </Map>
+        </value>
+      </entry>
+	</Map>
+  </Attributes>
+  <Templates>
+      <Template name="account" schemaObjectType="account" usage="Create">
+        <Field displayName="con_form_linux_direct_username" helpKey="help_con_linux_direct_username" name="username" required="true" section="" type="string"/>
+        <Field displayName="con_form_linux_direct_homedir" helpKey="help_con_linux_direct_homedir" name="home" reviewRequired="true" section="" type="string"/>
+        <Field displayName="con_form_linux_direct_shell" helpKey="help_con_linux_direct_shell" name="shell" reviewRequired="true" section="" type="string"/>
+        <Field displayName="con_form_linux_direct_userid" helpKey="help_con_linux_direct_userid" name="uid" reviewRequired="true" section="" type="string"/>
+		<Field displayName="con_form_linux_direct_password" helpKey="help_con_linux_direct_password" name="password" reviewRequired="true" type="secret"/>
+        <Field displayName="con_form_linux_direct_mindays" helpKey="help_con_linux_direct_mindays" name="pwdmin" reviewRequired="true" section="" type="string"/>
+        <Field displayName="con_form_linux_direct_maxdays" helpKey="help_con_linux_direct_maxdays" name="pwdmax" reviewRequired="true" section="" type="string"/>
+        <Field displayName="con_form_linux_direct_warntime" helpKey="help_con_linux_direct_warntime" name="pwdwarn" reviewRequired="true" section="" type="string"/>
+        <Field displayName="con_form_linux_direct_grpname" helpKey="help_con_linux_direct_grpname" name="primgrp" reviewRequired="true" section="" type="string"/>
+        <Field displayName="con_form_linux_direct_comment" helpKey="help_con_linux_direct_comment" name="comment" reviewRequired="true" section="" type="string"/>
+        <Field displayName="con_form_linux_direct_accdur" helpKey="help_con_linux_direct_accdur" name="expiration" reviewRequired="true" section="" type="string"/>
+        <Field displayName="con_form_linux_direct_acctime" helpKey="help_con_linux_direct_acctime" name="inactive" reviewRequired="true" section="" type="string"/>
+        <Field displayName="con_form_linux_direct_home" helpKey="help_con_linux_direct_home" name="crthomedir" reviewRequired="true" section="" type="boolean"/>
+        <Field displayName="con_form_linux_direct_dupid" helpKey="help_con_linux_direct_dupid" name="dupuid" reviewRequired="true" section="" type="boolean"/>
+		<Field displayName="con_form_linux_direct_pswdlogin" helpKey="help_con_linux_direct_pswdlogin" name="forcepwdchg" reviewRequired="true" type="boolean" value="false"/>
+      </Template>
+      <Template name="create group" schemaObjectType="group" usage="Create">
+        <Field displayName="con_form_linux_direct_group" helpKey="help_con_linux_direct_group" name="name" required="true" section="" type="string"/>
+        <Field displayName="con_form_linux_direct_gid" helpKey="help_con_linux_direct_gid" name="groupid" reviewRequired="true" section="" type="string"/>
+        <Field displayName="con_form_linux_direct_dupgrp" helpKey="help_con_linux_direct_dupgrp" name="dupgid" postBack="true" type="boolean"/>
+      </Template>
+      <Template name="update group" schemaObjectType="group" usage="Update">
+        <Field displayName="con_form_linux_direct_gid" helpKey="help_con_linux_direct_gid" name="groupid" reviewRequired="true" section="" type="string"/>
+        <Field displayName="con_form_linux_direct_dupgrp" helpKey="help_con_linux_direct_dupgrp" name="dupgid" reviewRequired="true" type="boolean"/>
+        <OwnerDefinition value=""/>
+      </Template>
+    </Templates>
+  <Schemas>
+    <Schema displayAttribute="username"  identityAttribute="username" nativeObjectType="account" objectType="account">
+      <AttributeDefinition name="username" remediationModificationType="None" required="true" type="string">
+        <Description>Name of User</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="uid" remediationModificationType="None" type="string">
+        <Description>The numerical value of the user's ID</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="home" remediationModificationType="None" type="string">
+        <Description>Home Directory of User</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="pwdlastchg" remediationModificationType="None" type="string">
+        <Description>The number of days since January 1st, 1970 when the password was last changed</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="pwdmin" remediationModificationType="None" type="string">
+        <Description>Minimum number of days between password change</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="pwdmax" remediationModificationType="None" type="string">
+        <Description>The maximum number of days during which a password is valid</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="pwdwarn" remediationModificationType="None" type="string">
+        <Description>Number of days of warning before password expires</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="primgrp" remediationModificationType="None" type="string">
+        <Description>Primary Group of User</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="comment" remediationModificationType="None" type="string">
+        <Description>User's password file comment field</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="expiration" remediationModificationType="None" type="string">
+        <Description>Set the date or number of days since January 1, 1970 on which the user's account will no longer be accessible</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="inactive" remediationModificationType="None" type="string">
+        <Description>Set the number of days of inactivity after a password has expired before the account is locked</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="lastLogin" remediationModificationType="None" type="string">
+        <Description>Last login time of User</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="shell" remediationModificationType="None" type="string">
+        <Description>The name of the user's login shell</Description>
+      </AttributeDefinition>
+      <AttributeDefinition entitlement="true" managed="true" multi="true" name="groups" schemaObjectType="group" type="string">
+        <Description>List of groups which the user is a member of</Description>
+      </AttributeDefinition>
+    </Schema>
+    <Schema displayAttribute="name" featuresString="PROVISIONING" identityAttribute="name" nativeObjectType="group" objectType="group">
+      <AttributeDefinition name="name" remediationModificationType="None" required="true" type="string">
+        <Description>Name of Group</Description>
+      </AttributeDefinition>
+      <AttributeDefinition name="groupid" remediationModificationType="None" required="true" type="string">
+        <Description>The numerical value of the group's ID</Description>
+      </AttributeDefinition>
+    </Schema>
+  </Schemas>
+</Application>
+</List>
+  </value>
+  </entry>
+  </Map>
+  </Attributes>
+  </Configuration>
+</ImportAction>
+</sailpoint>
