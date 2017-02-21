@@ -33,8 +33,7 @@ username ALL = (root) PASSWD:/bin/chmod, /usr/sbin/useradd, /usr/sbin/usermod, /
 ```
 ### Installing
 
-#### Compile and Deploy
-
+#### Compile
 
 Ant build script is configured under /HPUXConnector/build.xml could manage that compilation and deployment. 
 (Replace directory names and project name with names appropriate to the specific installation.)
@@ -45,17 +44,17 @@ To enable Ant view in Eclipse do following:
 ```
 Windows > Show View > Other > Ant > Ant
 ```
-Your Ant View should like this:
+Your Ant View should like this, Click Complie button, will export jar file under /HPUXConnector/build/jar folder:
 
 ![alt text](https://github.com/mike818148/HPUXConnector/blob/master/HPUXConnectorAnt.PNG "Logo Title Text 1")
 
-Click Complie button, will export jar file under /HPUXConnector/build/jar folder
+#### Configure
 
-Move /HPUXConnector/build/jar/HPUXConnector.jar and /HPUXConnector/lib/jsch-0.1.54.jar under ~/identityiq/WEB-INF/lib
+* Move /HPUXConnector/build/jar/HPUXConnector.jar and /HPUXConnector/lib/jsch-0.1.54.jar under ~/identityiq/WEB-INF/lib
 
-Move /HPUXConnector/HPUXAttributesForm.xhtml under ~/identityiq/define/applications
+* Move /HPUXConnector/HPUXAttributesForm.xhtml under ~/identityiq/define/applications
 
-Start IIQ and import /HPUXConnector/HP-UX-Direct.xml
+* Start IIQ and import /HPUXConnector/HP-UX-Direct.xml
 
 ## Deployment
 
@@ -64,11 +63,11 @@ Add additional notes about how to deploy this on a live system
 ## Built With
 
 * SailPoint OpenConnector
-* Jsch
+* [Jsch Library](http://www.jcraft.com/jsch/)
 
 ## Contributing
 
-[Compass] Custom Connector [CONTRIBUTING.md](https://community.sailpoint.com/docs/DOC-4793), to reference about architecture of IIQ Custom Connector for details and other examples.
+Please reference document [Compass - Custom Connector](https://community.sailpoint.com/docs/DOC-4793) for more about architecture of IIQ Custom Connector for details and other examples.
 
 ## Versioning
 
