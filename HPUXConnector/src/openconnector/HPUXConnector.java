@@ -1,6 +1,5 @@
 /* (c) Copyright 2010 SailPoint Technologies, Inc., All Rights Reserved. */
 /* (c) Copyright 2017 Gamatech Ltd. Hong Kong, Inc., All Rights Reserved. */
-/* Version: 1.0.0 */
 
 package openconnector;
 
