@@ -28,6 +28,16 @@
           <Boolean>false</Boolean>
         </value>
       </entry>
+	  <entry key="IsTrusted">
+        <value>
+          <Boolean>false</Boolean>
+        </value>
+      </entry>
+	  <entry key="HasShadowFile">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
       <entry key="PassphraseForPrivateKey"/>
       <entry key="PasswdBasicErrors">
         <value>
@@ -169,9 +179,9 @@
       <entry key="enable.account" value="passwd -d"/>
 	  <entry key="enable.account.trusted" value="/usr/lbin/modprpw -k"/>
       <entry key="encrypted" value="SudoUserPassword,PassphraseForPrivateKey"/>
-      <!--entry key="get.loginsyslimit" value="cat /etc/pam.d/system-auth"/ HPUX no such file-->
+      <entry key="get.loginsyslimit"/>
       <entry key="get.oldaccountval" value="groups"/>
-      <!--entry key="get.userfailedlogin" value="faillog"/-->
+      <entry key="get.userfailedlogin"/>
       <entry key="get.userpwdrow" value="cat /etc/passwd | grep"/>
       <entry key="get.usershadowrow" value="cat /etc/shadow | grep"/>
       <entry key="groupadd">
@@ -243,7 +253,6 @@
         </value>
       </entry>
       <entry key="host" value="192.168.232.129"/>
-      <entry key="interactiveSetPassword" value="true"/>
       <entry key="modify.account" value="usermod"/>
       <entry key="modify.group" value="groupmod"/>
       <entry key="nativeChangeDetectionAttributeScope" value="entitlements"/>

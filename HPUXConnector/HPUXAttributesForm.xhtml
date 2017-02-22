@@ -200,8 +200,8 @@
                                 alt="If system has /etc/shadow file?"/>
                 </td>
                 <td valign="center">
-                    <h:selectBooleanCheckbox id="hasShadowFile"
-                                value="#{applicationObject.attributes['hasShadowFile']}"
+                    <h:selectBooleanCheckbox id="HasShadowFile"
+                                value="#{applicationObject.attributes['HasShadowFile']}"
                                 requiredMessage="#{msgs.help_con_form_unix_root}"
                                 disabled="#{!sp:hasRight(facesContext, 'ManageApplication')}"/>
                 </td>
@@ -215,8 +215,8 @@
                                 alt="If system is Trusted mode?"/>
                 </td>
                 <td valign="center">
-                    <h:selectBooleanCheckbox id="isTrusted"
-                                value="#{applicationObject.attributes['isTrusted']}"
+                    <h:selectBooleanCheckbox id="IsTrusted"
+                                value="#{applicationObject.attributes['IsTrusted']}"
                                 requiredMessage="#{msgs.help_con_form_unix_root}"
                                 disabled="#{!sp:hasRight(facesContext, 'ManageApplication')}"/>
                 </td>

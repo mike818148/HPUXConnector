@@ -229,8 +229,8 @@ public class HPUXConnector extends AbstractConnector {
 		} else {
 			ssh_port = 22;
 		}
-		if (config.getConfig().containsKey("isSudoUser")) {
-			isSudoer = config.getBoolean("isSudoUser");
+		if (config.getConfig().containsKey("IsSudoUser")) {
+			isSudoer = config.getBoolean("IsSudoUser");
 		} else {
 			isSudoer = false;
 		}
@@ -239,12 +239,12 @@ public class HPUXConnector extends AbstractConnector {
 		} else {
 			hasShadowFile = false;
 		}
-		if (config.getConfig().containsKey("isTrusted")) {
-			isTrusted = config.getBoolean("isTrusted");
+		if (config.getConfig().containsKey("IsTrusted")) {
+			isTrusted = config.getBoolean("IsTrusted");
 		} else {
 			isTrusted = false;
 		}
-		if (config.getConfig().containsKey("sshLoginTimeout")) {
+		if (config.getConfig().containsKey("SshLoginTimeout")) {
 			sshLoginTimeout = Integer.parseInt(config.getString("sshLoginTimeout"));
 		} else {
 			sshLoginTimeout = 1000;
