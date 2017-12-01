@@ -206,21 +206,6 @@
                                 disabled="#{!sp:hasRight(facesContext, 'ManageApplication')}"/>
                 </td>
             </tr>
-	    <tr>
-                <td class='titleColumn certScheduleTitleCol' valign="center">
-                    <h:outputText style='padding:5px' value="Trusted mode?"/>
-                </td>
-                <td class="certScheduleHelpCol" valign="middle">
-                    <h:graphicImage id="imgHlpIsTrusted" styleClass="helpIcon" url="/images/icons/dashboard_help_16.png"
-                                alt="If system is Trusted mode?"/>
-                </td>
-                <td valign="center">
-                    <h:selectBooleanCheckbox id="IsTrusted"
-                                value="#{applicationObject.attributes['IsTrusted']}"
-                                requiredMessage="#{msgs.help_con_form_unix_root}"
-                                disabled="#{!sp:hasRight(facesContext, 'ManageApplication')}"/>
-                </td>
-            </tr> 
         </table>
         </div>
 

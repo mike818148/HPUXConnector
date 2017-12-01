@@ -35,7 +35,7 @@
       </entry>
 	  <entry key="HasShadowFile">
         <value>
-          <Boolean>true</Boolean>
+          <Boolean>false</Boolean>
         </value>
       </entry>
       <entry key="PassphraseForPrivateKey"/>
@@ -107,7 +107,7 @@
             <String>pwdwarn</String>
             <String>inactive</String>
             <String>expiration</String>
-            <String>keyword1</String>
+            <String>reserve</String>
           </List>
         </value>
       </entry>
@@ -116,8 +116,6 @@
       <entry key="SudoBasicErrorCode" value="127"/>
       <entry key="SudoError" value="Sorry, try again."/>
       <entry key="SudoErrorCode" value="1"/>
-      <entry key="SudoUser" value="usert01"/>
-      <entry key="SudoUserPassword" value="1:+rujZPK3O32hnyr7pR9vFw=="/>
       <entry key="aggregation.account" value="cat /etc/passwd | grep -v &apos;^+&apos; | grep -v &apos;^-&apos;"/>
       <entry key="aggregation.group" value="cat /etc/group | grep -v &apos;^+&apos; | grep -v &apos;^-&apos;"/>
       <entry key="aggregation.lockstatus" value="userstat"/>

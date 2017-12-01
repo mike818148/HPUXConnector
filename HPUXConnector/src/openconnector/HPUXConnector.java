@@ -373,8 +373,10 @@ public class HPUXConnector extends AbstractConnector {
 	/**
 	 * Used for interactive setPassword
 	 * 
-	 * @param command
-	 * @return prompt
+	 * @param command the command to be executed from configuration xml
+	 * @param newPassword 
+	 * @param currentPassword
+	 * @return void
 	 * @version - HPUXConnector 1.0.0
 	 * 
 	 */
@@ -512,7 +514,7 @@ public class HPUXConnector extends AbstractConnector {
 	}
 
 	/**
-	 * Set Shell Prompt 'PS1='SAILPOINT>'
+	 * Set Shell Prompt from xml configuration if set, default is 'PS1='SAILPOINT>'
 	 * 
 	 * @version - HPUXConnector 1.0.0
 	 */
@@ -555,8 +557,8 @@ public class HPUXConnector extends AbstractConnector {
 			shadowDB.add("pwdmax");
 			shadowDB.add("pwdwarn");
 			shadowDB.add("inactive");
-			// shadowDB.add("expiration");
-			// shadowDB.add("keyword1");
+			shadowDB.add("expiration");
+			shadowDB.add("reserved");
 		}
 		exit(funcName);
 	}
@@ -593,6 +595,8 @@ public class HPUXConnector extends AbstractConnector {
 	 * Get user last login info last(1): Reference:
 	 * http://nixdoc.net/man-pages/HP-UX/last.1.html
 	 * 
+	 * @param nativeIdentifier account id on the end point system
+	 * @return lastLogin time in string format 
 	 * @version - HPUXConnector 1.0.0
 	 */
 	private String getLastLoginTimeInformation(String nativeIdentifier) {
@@ -606,8 +610,8 @@ public class HPUXConnector extends AbstractConnector {
 			getLastLoginTimeInformationCommand = config.getString("lastlogin.account");
 		} else {
 			if (log.isDebugEnabled())
-				log.debug("Can't found lastlogin.account command, using default:userstat -u...");
-			getLastLoginTimeInformationCommand = "userstat -u";
+				log.debug("Can't found lastlogin.account command, using default:last ...");
+			getLastLoginTimeInformationCommand = "last";
 		}
 
 		executeCommand = getLastLoginTimeInformationCommand + " " + nativeIdentifier;
@@ -624,6 +628,8 @@ public class HPUXConnector extends AbstractConnector {
 	 * reference: userstat(1M)
 	 * http://docstore.mik.ua/manuals/hp-ux/en/B2355-60130/userstat.1M.html
 	 * 
+	 * @param nativeIdentifier account id on the end point system
+	 * @return Account_Status either Disabled/Enabled/Locked
 	 * @version - HPUXConnector 1.0.0
 	 */
 	private String getAccountActiveStatus(String nativeIdentifier) {
@@ -637,14 +643,14 @@ public class HPUXConnector extends AbstractConnector {
 		} else {
 			if (log.isDebugEnabled())
 				log.debug("Can't found aggregation.lockstatus command, using default:echo TestConnection...");
-			getAccountActiveStatusCommand = "userstat -u";
+			getAccountActiveStatusCommand = "userstat -u ";
 		}
 
 		executeCommand = getAccountActiveStatusCommand + " " + nativeIdentifier;
 		retPrompt = sshCommandExecute(executeCommand);
 		status = retPrompt.split("\\s+")[1];
 		if (status != null) {
-			if ("admlock".equals(status)) {
+			if (status.equals("admlock")) {
 				result = "Disabled";
 			}
 			if (status.contains("expacct")) {
@@ -678,6 +684,7 @@ public class HPUXConnector extends AbstractConnector {
 	 * from passwd DB reference: pwget(1M)
 	 * http://docstore.mik.ua/manuals/hp-ux/en/B2355-60130/pwget.1.html
 	 * 
+	 * @param nativeIdentifier account id on the end point system
 	 * @version - HPUXConnector 1.0.0
 	 */
 	private boolean isAccountExists(String nativeIdentifier) throws Exception {
@@ -702,7 +709,8 @@ public class HPUXConnector extends AbstractConnector {
 			isExists = true;
 		}
 		int status = getShellExecutionStatus();
-		if (status != 0) {
+		// These commands(pwget) return 0 upon success, 1 when a specific search fails, and 2 upon error.
+		if (status == 2) {
 			throw new Exception("isAccountExists() Command unexcepted error:" + executeCommand);
 		}
 		exit(funcName);
@@ -710,8 +718,11 @@ public class HPUXConnector extends AbstractConnector {
 	}
 
 	/**
-	 * Return related value inside appliction xml
+	 * Return command parameter value inside appliction xml
 	 * 
+	 * @param command the executed command
+	 * @param attr normally exists prompt or flag parameters
+	 * @param key the key value for exists/flags map
 	 * @version - HPUXConnector 1.0.0
 	 */
 	private String getAttributeMapValue(String command, String attr, String key) {
@@ -726,6 +737,35 @@ public class HPUXConnector extends AbstractConnector {
 				System.out.println("Can't find option flag for:" + command + "->" + attr + "->" + key);
 		}
 		return option;
+	}
+	
+	/**
+	 * Print all objects in memory to System.out.
+	 * 
+	 */
+	private static String digitsMapping(char digit) {
+		int temp;
+		int ascii;
+		String digitStr = Character.toString(digit);
+		
+		if(digitStr.equals(".")) return "0";
+		else if(digitStr.equals("/")) return "1";
+		else if(digitStr.matches("[0-9]")) {
+			temp = Integer.parseInt(digitStr);
+			temp += 2;
+			return String.valueOf(temp);
+		}
+		else if(digitStr.matches("[A-Z]")) {
+			ascii = (int) digit;
+			temp = ascii - 53;
+			return String.valueOf(temp);
+		}
+		else if(digitStr.matches("[a-z]")) {
+			ascii = (int) digit;
+			temp = ascii - 59;
+			return String.valueOf(temp);
+		}
+		else return "0";
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
@@ -762,9 +802,9 @@ public class HPUXConnector extends AbstractConnector {
 	/**
 	 * Test if ssh connection is success
 	 * 
-	 * @return
+	 * @return connRes true for success false for failed
 	 * @throws Exception
-	 * @version - 20170217 - Mike
+	 * @version - HPUXConnector 1.0.0
 	 */
 	public boolean sshTestConnection() throws Exception {
 		String funcName = "sshTestConnection";
@@ -880,6 +920,9 @@ public class HPUXConnector extends AbstractConnector {
 	 * LCM - Create Account Additional options will be implement into one
 	 * command
 	 * 
+	 * @param nativeIdentifier account id on the end point system
+	 * @param items parameters along with create account commands
+	 * @return result provisioning result and exceptions
 	 * @version - HPUXConnector 1.0.0
 	 */
 	@Override
@@ -966,7 +1009,6 @@ public class HPUXConnector extends AbstractConnector {
 					//
 					Map<String, Object> options = new HashMap<String, Object>();
 					String newPassword = null;
-					String currentPassword = null;
 					if (items != null) {
 						for (Item item : items) {
 							String name = item.getName();
@@ -983,7 +1025,7 @@ public class HPUXConnector extends AbstractConnector {
 					}
 					// Get current password
 					if (newPassword != null) {
-						Result setPasswordResult = setPassword(nativeIdentifier, newPassword, currentPassword, null, options);
+						Result setPasswordResult = setPassword(nativeIdentifier, newPassword, null, null, options);
 						result.add(setPasswordResult.getMessages());
 					}
 				} else if (OBJECT_TYPE_GROUP.equals(this.objectType)) {
@@ -1030,6 +1072,9 @@ public class HPUXConnector extends AbstractConnector {
 	/**
 	 * LCM - Read Account
 	 * 
+	 * @param nativeIdentifier account id on the end point system
+	 * @param unused
+	 * @return Resource Object in Map format
 	 * @version - HPUXConnector 1.0.0
 	 */
 	private Map<String, Object> read(String nativeIdentifier, boolean forUpdate) throws ConnectorException, IllegalArgumentException {
@@ -1086,37 +1131,75 @@ public class HPUXConnector extends AbstractConnector {
 						System.out.println("[ERROR] id: User not found or invalid options or invalid combination of options.");
 					else if (status == 2)
 						System.out.println("[ERROR] id: The -P option is given when PRM is not supported or configured.");
-
+					
+					
 					/*
-					 * Retrieve data from passwd file
+					 *  Here we differentiate system with shadow utility and without. 
+					 *  System with shadow utility will store the password information in the shadow file.
+					 *  System without shadow, password information will store in the passwd password field with 
+					 *  certain format. 
+					 *  
+					 *  The encrypted password consists of 13 characters chosen from a 64-character set of "digits" 
+					 *  described below, Login can be prevented by entering in the password field a character 
+					 *  that is not part of the set of digits (such as *)
+					 *  
+					 *  The characters used to represent "digits" are . for 0, / for 1, 0 through 9 for 2 
+					 *  through 11, A through Z for 12 through 37, and a through z for 38 through 63.
+					 *  
+					 *  Password aging is put in effect for a particular user if his encrypted password in 
+					 *  the password file is followed by a comma and a non-null string of characters from the 
+					 *  above alphabet. (Such a string must be introduced in the first instance by a superuser.) 
+					 *  This string defines the "age" needed to implement password aging.
+					 *  
+					 *  UNIX keeps internal time stamps in a format with a base date of Thursday January 1, 1970. 
+					 *  Because of this, passwd considers the beginning of a week to be 00:00 GMT Thursday.
+					 *  
+					 *  The first character of the age, M, denotes the maximum number of weeks for which a password 
+					 *  is valid. A user who attempts to login after his password has expired is forced to supply a 
+					 *  new one. The next character, m, denotes the minimum period in weeks that must expire before 
+					 *  the password can be changed. The remaining two characters define the week when the password 
+					 *  was last changed (a null string is equivalent to zero). M and m have numerical values in the 
+					 *  range 0 through 63 that correspond to the 64-character set of "digits" shown above.
+					 *  
+					 *  If m = M = 0 (derived from the string . or ..), the user is forced to change his password next 
+					 *  time he logs in (and the "age" disappears from his entry in the password file). If m > M 
+					 *  (signified, for example, by the string ./), then only a superuser (not the user) can change the 
+					 *  password. Not allowing the user to ever change the password is discouraged.
 					 */
-					executeCommand = "cat /etc/passwd | awk -F ':' '{if($1 == \"" + nativeIdentifier + "\") print}'";
-					retPrompt = sshCommandExecute(executeCommand);
-					String[] passwdDBAcc = retPrompt.split(":", -1);
-					String attribute;
-					String attrVal;
-					for (int i = 0; i < passwdDB.size(); i++) {
-						if (i != 1) {
-							attribute = passwdDB.get(i);
-							if (log.isDebugEnabled())
-								log.debug("Current attribute=" + attribute);
-							attrVal = passwdDBAcc[i];
+					
+					
+					
+					// Normal case
+					if(hasShadowFile) {
+						/*
+						 * Retrieve data from passwd file
+						 */
+						executeCommand = "cat /etc/passwd | awk -F ':' '{if($1 == \"" + nativeIdentifier + "\") print}'";
+						retPrompt = sshCommandExecute(executeCommand);
+						String[] passwdDBAcc = retPrompt.split(":", -1);
+						String attribute;
+						String attrVal;
+						for (int i = 0; i < passwdDB.size(); i++) {
+							if (i != 1) {
+								attribute = passwdDB.get(i);
+								if (log.isDebugEnabled())
+									log.debug("Current attribute=" + attribute);
+								attrVal = passwdDBAcc[i];
 
-							if (attrVal != null && log.isDebugEnabled())
-								log.debug("Found in Passwd, value:" + attrVal);
+								if (attrVal != null && log.isDebugEnabled())
+									log.debug("Found in Passwd, value:" + attrVal);
 
-							if (attrVal != null)
-								updateObj.put(attribute, attrVal);
+								if (attrVal != null)
+									updateObj.put(attribute, attrVal);
+							}
 						}
-					}
-					status = 0;
-					status = getShellExecutionStatus();
-					if (status != 0)
-						System.out.println("[ERROR] Shell Exeucte Command: " + executeCommand + ", Failed, Status = " + status);
-					/*
-					 * Retrieve data from shadow file
-					 */
-					if (hasShadowFile) {
+						status = 0;
+						status = getShellExecutionStatus();
+						if (status != 0)
+							System.out.println("[ERROR] Shell Exeucte Command: " + executeCommand + ", Failed, Status = " + status);
+						/*
+						 * Retrieve data from shadow file
+						 */
 						executeCommand = "cat /etc/shadow | awk -F ':' '{if($1 == \"" + nativeIdentifier + "\") print}'";
 						retPrompt = sshCommandExecute(executeCommand);
 						String[] shadowDBAcc = retPrompt.split(":", -1);
@@ -1140,10 +1223,72 @@ public class HPUXConnector extends AbstractConnector {
 						status = getShellExecutionStatus();
 						if (status != 0)
 							System.out.println("[ERROR] Shell Exeucte Command: " + executeCommand + ", Failed, Status = " + status);
-					} else {
-						if (log.isDebugEnabled())
-							log.debug("System no /etc/shadow file");
+					}else { // No Shadow file case
+						/*
+						 * Retrieve data from passwd file
+						 */
+						executeCommand = "cat /etc/passwd | awk -F ':' '{if($1 == \"" + nativeIdentifier + "\") print}'";
+						retPrompt = sshCommandExecute(executeCommand);
+						String[] passwdDBAcc = retPrompt.split(":", -1);
+						String attribute;
+						String attrVal;
+						char pwdInfoDig;
+						String pwdInfoDigDecoded;
+						for (int i = 0; i < passwdDB.size(); i++) {
+							if (i != 1) {
+								attribute = passwdDB.get(i);
+								if (log.isDebugEnabled())
+									log.debug("Current attribute=" + attribute);
+								attrVal = passwdDBAcc[i];
+
+								if (attrVal != null && log.isDebugEnabled())
+									log.debug("Found in Passwd, value:" + attrVal);
+
+								if (attrVal != null)
+									updateObj.put(attribute, attrVal);
+							}else if(i ==1) { // Get the password field
+								// Hard code to get the password age information
+								attrVal = passwdDBAcc[i];
+								if(attrVal.contains(",")) {
+									int attrValLen = attrVal.length();
+									int commaPos = attrVal.indexOf(",");
+									if(commaPos < (attrValLen -1 )) {
+										String pwdInfo = attrVal.substring(commaPos+1,attrValLen);
+										int pwdInfoLen = pwdInfo.length();
+										
+										for(int j=0 ; j<pwdInfoLen ; j++) {
+											if(j == 0) { // Contains Max
+												pwdInfoDig = pwdInfo.charAt(j);
+												pwdInfoDigDecoded = digitsMapping(pwdInfoDig);
+												updateObj.put("pwdmax", pwdInfoDigDecoded);
+											}else if(j == 1) { // Contains Min
+												pwdInfoDig = pwdInfo.charAt(1);
+												pwdInfoDigDecoded = digitsMapping(pwdInfoDig);
+												updateObj.put("pwdmin", pwdInfoDigDecoded);
+											}else {
+												break;
+											}
+										}
+										if(pwdInfoLen > 2) {
+											if(pwdInfoLen == 3) {
+												updateObj.put("pwdlastchg", pwdInfo.substring(2, 3));
+											}else if(pwdInfoLen == 4) {
+												updateObj.put("pwdlastchg", pwdInfo.substring(2, 4));
+											}
+										}
+									}
+								}else {
+									if (log.isDebugEnabled())
+										log.debug("No password aging information found...");
+								}
+							}
+						}
+						status = 0;
+						status = getShellExecutionStatus();
+						if (status != 0)
+							System.out.println("[ERROR] Shell Exeucte Command: " + executeCommand + ", Failed, Status = " + status);
 					}
+					
 					/*
 					 * Get account status
 					 */
@@ -1378,8 +1523,8 @@ public class HPUXConnector extends AbstractConnector {
 						updateCommand = config.getString("modify.account");
 					} else {
 						if (log.isDebugEnabled())
-							log.debug("Can't found update.account command, using default:useradd...");
-						updateCommand = "useradd";
+							log.debug("Can't found update.account command, using default:usermod...");
+						updateCommand = "usermod";
 					}
 					String executeCommand;
 					//
@@ -1485,7 +1630,7 @@ public class HPUXConnector extends AbstractConnector {
 						deleteCommand = config.getString("delete.account");
 					} else {
 						if (log.isDebugEnabled())
-							log.debug("Can't found delete.account command, using default:useradd...");
+							log.debug("Can't found delete.account command, using default:userdel...");
 						deleteCommand = "userdel";
 					}
 					//
