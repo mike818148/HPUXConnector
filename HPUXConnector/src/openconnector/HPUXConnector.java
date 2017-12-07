@@ -1407,6 +1407,43 @@ public class HPUXConnector extends AbstractConnector {
 
 							if (attrVal != null)
 								eachAccount.put(attribute, attrVal);
+						}else if(i ==1 && !hasShadowFile) { // Get the password field
+							// Hard code to get the password age information
+							attrVal = accAttrs[i];
+							char pwdInfoDig;
+							String pwdInfoDigDecoded;
+							if(attrVal.contains(",")) {
+								int attrValLen = attrVal.length();
+								int commaPos = attrVal.indexOf(",");
+								if(commaPos < (attrValLen -1 )) {
+									String pwdInfo = attrVal.substring(commaPos+1,attrValLen);
+									int pwdInfoLen = pwdInfo.length();
+									
+									for(int j=0 ; j<pwdInfoLen ; j++) {
+										if(j == 0) { // Contains Max
+											pwdInfoDig = pwdInfo.charAt(j);
+											pwdInfoDigDecoded = digitsMapping(pwdInfoDig);
+											eachAccount.put("pwdmax", pwdInfoDigDecoded);
+										}else if(j == 1) { // Contains Min
+											pwdInfoDig = pwdInfo.charAt(1);
+											pwdInfoDigDecoded = digitsMapping(pwdInfoDig);
+											eachAccount.put("pwdmin", pwdInfoDigDecoded);
+										}else {
+											break;
+										}
+									}
+									if(pwdInfoLen > 2) {
+										if(pwdInfoLen == 3) {
+											eachAccount.put("pwdlastchg", pwdInfo.substring(2, 3));
+										}else if(pwdInfoLen == 4) {
+											eachAccount.put("pwdlastchg", pwdInfo.substring(2, 4));
+										}
+									}
+								}
+							}else {
+								if (log.isDebugEnabled())
+									log.debug("No password aging information found...");
+							}
 						}
 					}
 					eachAccounts.put((String) eachAccount.get("username"), eachAccount);
