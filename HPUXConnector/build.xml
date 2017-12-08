@@ -1,5 +1,5 @@
 <project name="HPUXConnector" default="jar" basedir=".">  
-  <property name="tomcat.home" value="C:\Users\mike.chung\workspace\HPUXConnector"/>  
+  <property name="tomcat.home" value="C:\Users\mike.chung\git\HPUXConnector\HPUXConnector"/>  
   <property name="lib.dir" value="${tomcat.home}\lib"/> <property name="src.dir" value="src"/>  
   <property name="dest.dir" value="build/classes"/>  
   <property name="jar.dir" value="build/jar"/>       
