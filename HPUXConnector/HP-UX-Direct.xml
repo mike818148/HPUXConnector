@@ -11,7 +11,7 @@
 <Application connector="sailpoint.connector.OpenConnectorAdapter" featuresString="PROVISIONING, SYNC_PROVISIONING, ENABLE, UNLOCK, SEARCH, UNSTRUCTURED_TARGETS, PASSWORD, CURRENT_PASSWORD, ACCOUNT_ONLY_REQUEST" icon="enterpriseIcon" name="HPUXTest" type="HPUX - Direct">
   <Attributes>
     <Map>
-	  <entry key="isexists.account" value="getent passwd"/>
+	  <entry key="isexists.account" value="pwget -n"/>
 	  <entry key="formPath" value="HPUXAttributesForm.xhtml"/>
       <entry key="GroupDBFormat">
         <value>
@@ -118,7 +118,7 @@
       <entry key="SudoErrorCode" value="1"/>
       <entry key="aggregation.account" value="cat /etc/passwd | grep -v &apos;^+&apos; | grep -v &apos;^-&apos;"/>
       <entry key="aggregation.group" value="cat /etc/group | grep -v &apos;^+&apos; | grep -v &apos;^-&apos;"/>
-      <entry key="aggregation.lockstatus" value="userstat"/>
+      <entry key="aggregation.lockstatus" value="userstat -u"/>
       <entry key="aggregation.passwd" value="cat /etc/shadow | grep -v &apos;^+&apos; | grep -v &apos;^-&apos;"/>
       <entry key="change.password" value="passwd"/>
       <entry key="changepassword.resetmode" value="passwd -f"/>
@@ -506,13 +506,11 @@
 		<Field displayName="con_form_linux_direct_password" helpKey="help_con_linux_direct_password" name="password" reviewRequired="true" type="secret"/>
         <Field displayName="con_form_linux_direct_mindays" helpKey="help_con_linux_direct_mindays" name="pwdmin" reviewRequired="true" section="" type="string"/>
         <Field displayName="con_form_linux_direct_maxdays" helpKey="help_con_linux_direct_maxdays" name="pwdmax" reviewRequired="true" section="" type="string"/>
-        <Field displayName="con_form_linux_direct_warntime" helpKey="help_con_linux_direct_warntime" name="pwdwarn" reviewRequired="true" section="" type="string"/>
         <Field displayName="con_form_linux_direct_grpname" helpKey="help_con_linux_direct_grpname" name="primgrp" reviewRequired="true" section="" type="string"/>
         <Field displayName="con_form_linux_direct_comment" helpKey="help_con_linux_direct_comment" name="comment" reviewRequired="true" section="" type="string"/>
         <Field displayName="con_form_linux_direct_accdur" helpKey="help_con_linux_direct_accdur" name="expiration" reviewRequired="true" section="" type="string"/>
-        <Field displayName="con_form_linux_direct_acctime" helpKey="help_con_linux_direct_acctime" name="inactive" reviewRequired="true" section="" type="string"/>
         <Field displayName="con_form_linux_direct_home" helpKey="help_con_linux_direct_home" name="crthomedir" reviewRequired="true" section="" type="boolean"/>
-        <Field displayName="con_form_linux_direct_dupid" helpKey="help_con_linux_direct_dupid" name="dupuid" reviewRequired="true" section="" type="boolean"/>
+		<Field displayName="con_form_linux_direct_dupid" helpKey="help_con_linux_direct_dupid" name="dupuid" reviewRequired="true" type="boolean"/>
 		<Field displayName="con_form_linux_direct_pswdlogin" helpKey="help_con_linux_direct_pswdlogin" name="forcepwdchg" reviewRequired="true" type="boolean" value="false"/>
       </Template>
       <Template name="create group" schemaObjectType="group" usage="Create">
@@ -547,7 +545,7 @@
         <Description>The maximum number of days during which a password is valid</Description>
       </AttributeDefinition>
       <AttributeDefinition name="pwdwarn" remediationModificationType="None" type="string">
-        <Description>Number of days of warning before password expires</Description>
+        <Description>Number of days of warning before password expires. NOTE: This attribute is not available for HP-UX Basic mode, need shadow utility or trusted system enabled.</Description>
       </AttributeDefinition>
       <AttributeDefinition name="primgrp" remediationModificationType="None" type="string">
         <Description>Primary Group of User</Description>
@@ -559,7 +557,7 @@
         <Description>Set the date or number of days since January 1, 1970 on which the user's account will no longer be accessible</Description>
       </AttributeDefinition>
       <AttributeDefinition name="inactive" remediationModificationType="None" type="string">
-        <Description>Set the number of days of inactivity after a password has expired before the account is locked</Description>
+        <Description>Set the number of days of inactivity after a password has expired before the account is locked. NOTE: This attribute is not available for HP-UX Basic mode, need shadow utility or trusted system enabled.</Description>
       </AttributeDefinition>
       <AttributeDefinition name="lastLogin" remediationModificationType="None" type="string">
         <Description>Last login time of User</Description>

@@ -101,10 +101,12 @@ public class HPUXConnector extends AbstractConnector {
 	// //////////////////////////////////////////////////////////////////////////
 
 	public static final String ATTR_USERNAME = "username";
+	public static final String ATTR_PASSWD = "*password*";
 	public static final String ATTR_UID = "uid";
 	public static final String ATTR_GID = "primgrp";
 	public static final String ATTR_COMMENT = "comment";
 	public static final String ATTR_HOME = "home";
+	public static final String ATTR_SHELL = "shell";
 	public static final String ATTR_GROUPS = "groups";
 
 	public static final String ATTR_PWDLASTCHG = "pwdlastchg";
@@ -125,6 +127,26 @@ public class HPUXConnector extends AbstractConnector {
 	public static ArrayList<String> passwdDB = new ArrayList<String>();
 	public static ArrayList<String> shadowDB = new ArrayList<String>();
 
+	// //////////////////////////////////////////////////////////////////////////
+	//
+	// DEFAULT commands Variables
+	//
+	// //////////////////////////////////////////////////////////////////////////
+	
+	private static String aggregation_lockstatus_defaultCmd = "userstat -u";
+	private static String modify_account_defaultCmd = "usermod";
+	private static String lastlogin_account_defaultCmd = "last";
+	private static String change_password_defaultCmd = "passwd";
+	private static String create_account_defaultCmd = "useradd";
+	private static String disable_account_defaultCmd = "passwd -l";
+	private static String disable_account_trusted_defaultCmd = "/usr/lbin/modprpw -e";
+	private static String enable_account_trusted_defaultCmd = "/usr/lbin/modprpw -k";
+	private static String enable_account_reset_password = "abc123";
+	private static String delete_account_defaultCmd = "userdel";
+	private static String isexists_account_defaultCmd = "pwget -n";
+	private static String testconnection_defaultCmd = "echo TestConnection";
+	
+	
 	// //////////////////////////////////////////////////////////////////////////
 	//
 	// SERVER Variables
@@ -207,31 +229,31 @@ public class HPUXConnector extends AbstractConnector {
 	private void configure() {
 		String funcName = "configure()";
 		enter(funcName);
-		// System.out.println(config.getConfig());
+		System.out.println(config.getConfig());
 		if (config.getConfig().containsKey("SudoUser")) {
 			idmuser_username = config.getString("SudoUser");
 		} else {
-			// idmuser_username = "usert01";
+			//idmuser_username = "root";
 		}
 		if (config.getConfig().containsKey("SudoUserPassword")) {
 			idmuser_password = config.getString("SudoUserPassword");
 		} else {
-			// idmuser_password = "password";
+			//idmuser_password = "******";
 		}
 		if (config.getConfig().containsKey("host")) {
 			host_ip = config.getString("host");
 		} else {
-			// host_ip = "192.168.232.129";
+			//host_ip = "cloud.siteox.com";
 		}
 		if (config.getConfig().containsKey("SshPort")) {
 			ssh_port = Integer.parseInt(config.getString("SshPort"));
 		} else {
-			ssh_port = 22;
+			//ssh_port = 22;
 		}
 		if (config.getConfig().containsKey("IsSudoUser")) {
 			isSudoer = config.getBoolean("IsSudoUser");
 		} else {
-			isSudoer = false;
+			isSudoer = true;
 		}
 		if (config.getConfig().containsKey("hasShadowFile")) {
 			hasShadowFile = config.getBoolean("hasShadowFile");
@@ -358,12 +380,12 @@ public class HPUXConnector extends AbstractConnector {
 			return null;
 		}
 		String output = outputBuffer.toString();
-		if (isSudoer) {
+		/*if (isSudoer) {
 			// Remove first line
 			output = output.substring(output.indexOf('\n') + 1);
 			// Remove second line
 			output = output.substring(output.indexOf('\n') + 1);
-		}
+		}*/
 		output = output.trim();
 		System.out.println("Return Prompt Result:" + output);
 		exit(funcName);
@@ -579,13 +601,13 @@ public class HPUXConnector extends AbstractConnector {
 			if (log.isDebugEnabled())
 				log.debug("No Passwd DB found, using default...");
 			passwdDB = new ArrayList<String>();
-			passwdDB.add("username");
-			passwdDB.add("password");
-			passwdDB.add("uid");
-			passwdDB.add("primgrp");
-			passwdDB.add("comment");
-			passwdDB.add("home");
-			passwdDB.add("shell");
+			passwdDB.add(ATTR_USERNAME);
+			passwdDB.add(ATTR_PASSWD);
+			passwdDB.add(ATTR_UID);
+			passwdDB.add(ATTR_GID);
+			passwdDB.add(ATTR_COMMENT);
+			passwdDB.add(ATTR_HOME);
+			passwdDB.add(ATTR_SHELL);
 		}
 
 		exit(funcName);
@@ -610,14 +632,14 @@ public class HPUXConnector extends AbstractConnector {
 			getLastLoginTimeInformationCommand = config.getString("lastlogin.account");
 		} else {
 			if (log.isDebugEnabled())
-				log.debug("Can't found lastlogin.account command, using default:last ...");
-			getLastLoginTimeInformationCommand = "last";
+				log.debug("Can't found lastlogin.account command, using default:"+lastlogin_account_defaultCmd);
+			getLastLoginTimeInformationCommand = lastlogin_account_defaultCmd;
 		}
 
 		executeCommand = getLastLoginTimeInformationCommand + " " + nativeIdentifier;
 		retPrompt = sshCommandExecute(executeCommand);
 		if (retPrompt != null)
-			lastLogin = retPrompt.split("\\s+")[1];
+			lastLogin = retPrompt.split("\n")[0];
 
 		exit(funcName);
 		return lastLogin;
@@ -642,37 +664,40 @@ public class HPUXConnector extends AbstractConnector {
 			getAccountActiveStatusCommand = config.getString("aggregation.lockstatus");
 		} else {
 			if (log.isDebugEnabled())
-				log.debug("Can't found aggregation.lockstatus command, using default:echo TestConnection...");
-			getAccountActiveStatusCommand = "userstat -u ";
+				log.debug("Can't found aggregation.lockstatus command, using default: "+aggregation_lockstatus_defaultCmd);
+			getAccountActiveStatusCommand = aggregation_lockstatus_defaultCmd;
 		}
 
 		executeCommand = getAccountActiveStatusCommand + " " + nativeIdentifier;
 		retPrompt = sshCommandExecute(executeCommand);
-		status = retPrompt.split("\\s+")[1];
-		if (status != null) {
-			if (status.equals("admlock")) {
-				result = "Disabled";
-			}
-			if (status.contains("expacct")) {
-				result = "Locked";
-			}
-			if (status.contains("exppw")) {
-				result = "Locked";
-			}
-			if (status.contains("inactive")) {
-				result = "Locked";
-			}
-			if (status.contains("maxtries")) {
-				result = "Locked";
-			}
-			if (status.contains("nullpw")) {
-				result = "Locked";
-			}
-			if (status.contains("tod")) {
-				result = "Locked";
-			}
-			if (status.equals("LK")) {
-				result = "Disabled";
+		if (retPrompt != null) {
+			String[] parts = retPrompt.split("\\s+");
+			if(parts != null && parts.length > 1 ) {
+				status = parts[1];
+				if (status.equals("admlock")) {
+					result = "Disabled";
+				}
+				if (status.contains("expacct")) {
+					result = "Locked";
+				}
+				if (status.contains("exppw")) {
+					result = "Locked";
+				}
+				if (status.contains("inactive")) {
+					result = "Locked";
+				}
+				if (status.contains("maxtries")) {
+					result = "Locked";
+				}
+				if (status.contains("nullpw")) {
+					result = "Locked";
+				}
+				if (status.contains("tod")) {
+					result = "Locked";
+				}
+				if (status.equals("LK")) {
+					result = "Disabled";
+				}
 			}
 		}
 		exit(funcName);
@@ -698,8 +723,8 @@ public class HPUXConnector extends AbstractConnector {
 			isAccountExistsCommand = config.getString("isexists.account");
 		} else {
 			if (log.isDebugEnabled())
-				log.debug("Can't found isexists.account command, using default:pwget -n...");
-			isAccountExistsCommand = "pwget -n";
+				log.debug("Can't found isexists.account command, using default:"+isexists_account_defaultCmd);
+			isAccountExistsCommand = isexists_account_defaultCmd;
 		}
 		String executeCommand = isAccountExistsCommand + " " + nativeIdentifier;
 		String returnPrompt = sshCommandExecute(executeCommand);
@@ -818,10 +843,10 @@ public class HPUXConnector extends AbstractConnector {
 				executeCommand = config.getString("testconnection");
 			} else {
 				if (log.isDebugEnabled())
-					log.debug("Can't found testconnection command, using default:echo TestConnection...");
-				executeCommand = "echo TestConnection";
+					log.debug("Can't found testconnection command, using default:"+testconnection_defaultCmd);
+				executeCommand = testconnection_defaultCmd;
 			}
-			String returnPrompt = sshCommandExecute("echo TestConnection");
+			String returnPrompt = sshCommandExecute(executeCommand);
 			System.out.println("sshTestConnection testConnPrompt:" + returnPrompt);
 
 			// Build return prompt check
@@ -954,8 +979,8 @@ public class HPUXConnector extends AbstractConnector {
 						createCommand = config.getString("create.account");
 					} else {
 						if (log.isDebugEnabled())
-							log.debug("Can't found create.account command, using default:useradd...");
-						createCommand = "useradd";
+							log.debug("Can't found create.account command, using default:"+create_account_defaultCmd);
+						createCommand = create_account_defaultCmd;
 					}
 					String executeCommand = createCommand;
 					//
@@ -965,17 +990,25 @@ public class HPUXConnector extends AbstractConnector {
 					if (items != null) {
 						for (Item item : items) {
 							String name = item.getName();
+							String flag;
 							Object value = item.getValue();
 							Item.Operation op = item.getOperation();
 							switch (op) {
 							case Add:
+								if (log.isDebugEnabled())
+									System.out.println("Create Account item:" + name + "---->" + value);
+								flag = getAttributeMapValue(createCommand, "flags", name);
+								if (flag != null) {
+									if((boolean)value == true) 
+										executeCommand = executeCommand + " " + flag + " ";
+								}
 								break;
 							case Remove:
 								break;
 							case Set: {
 								if (log.isDebugEnabled())
 									System.out.println("Create Account item:" + name + "---->" + value);
-								String flag = getAttributeMapValue(createCommand, "flags", name);
+								flag = getAttributeMapValue(createCommand, "flags", name);
 								if (flag != null)
 									executeCommand = executeCommand + " " + flag + " " + value;
 							}
@@ -1013,17 +1046,13 @@ public class HPUXConnector extends AbstractConnector {
 						for (Item item : items) {
 							String name = item.getName();
 							Object value = item.getValue();
-							Item.Operation op = item.getOperation();
-							if (op == Item.Operation.Set) {
-								if ("password".equals(name))
-									newPassword = (String) value;
-								else
-									options.put(name, value);
-							}
-
+							if (ATTR_PASSWD.equals(name))
+								newPassword = (String) value;
+							else
+								options.put(name, value);
 						}
 					}
-					// Get current password
+					// Set Password without Current Password
 					if (newPassword != null) {
 						Result setPasswordResult = setPassword(nativeIdentifier, newPassword, null, null, options);
 						result.add(setPasswordResult.getMessages());
@@ -1047,7 +1076,7 @@ public class HPUXConnector extends AbstractConnector {
 		}
 
 		Map<String, Object> object = new HashMap<String, Object>();
-		object.put(getIdentityAttribute(), nativeIdentifier);
+		object.put(ATTR_USERNAME, nativeIdentifier);
 		if (items != null) {
 			for (Item item : items)
 				object.put(item.getName(), item.getValue());
@@ -1560,8 +1589,8 @@ public class HPUXConnector extends AbstractConnector {
 						updateCommand = config.getString("modify.account");
 					} else {
 						if (log.isDebugEnabled())
-							log.debug("Can't found update.account command, using default:usermod...");
-						updateCommand = "usermod";
+							log.debug("Can't found update.account command, using default:"+modify_account_defaultCmd);
+						updateCommand = modify_account_defaultCmd;
 					}
 					String executeCommand;
 					//
@@ -1667,8 +1696,8 @@ public class HPUXConnector extends AbstractConnector {
 						deleteCommand = config.getString("delete.account");
 					} else {
 						if (log.isDebugEnabled())
-							log.debug("Can't found delete.account command, using default:userdel...");
-						deleteCommand = "userdel";
+							log.debug("Can't found delete.account command, using default:"+delete_account_defaultCmd);
+						deleteCommand = delete_account_defaultCmd;
 					}
 					//
 					// Add options incomplete...
@@ -1756,21 +1785,21 @@ public class HPUXConnector extends AbstractConnector {
 					// setShellPrompt();
 					// Build Command
 					String enableCommand = "";
-					if (isTrusted) {
+					if (!isTrusted) {
 						if (config.getConfig().containsKey("enable.account")) {
 							enableCommand = config.getString("enable.account");
 						} else {
 							if (log.isDebugEnabled())
-								log.debug("Can't found enable.account command, using default:passwd -d...");
-							enableCommand = "passwd -d";
+								log.debug("Can't found enable.account command, set a new password to enable account...");
+							setPassword(nativeIdentifier,enable_account_reset_password,null,null,null);
 						}
 					} else {
 						if (config.getConfig().containsKey("enable.account.trusted")) {
 							enableCommand = config.getString("enable.account.trusted");
 						} else {
 							if (log.isDebugEnabled())
-								log.debug("Can't found enable.account.trusted command, using default:/usr/lbin/modprpw -k...");
-							enableCommand = "/usr/lbin/modprpw -k";
+								log.debug("Can't found enable.account.trusted command, using default:"+enable_account_trusted_defaultCmd);
+							enableCommand = enable_account_trusted_defaultCmd;
 						}
 					}
 
@@ -1839,21 +1868,21 @@ public class HPUXConnector extends AbstractConnector {
 					// setShellPrompt();
 					// Build Command
 					String disableCommand = "";
-					if (isTrusted) {
+					if (!isTrusted) {
 						if (config.getConfig().containsKey("disable.account")) {
 							disableCommand = config.getString("disable.account");
 						} else {
 							if (log.isDebugEnabled())
-								log.debug("Can't found disable.account command, using default:passwd -l...");
-							disableCommand = "passwd -l";
+								log.debug("Can't found disable.account command, using default:"+disable_account_defaultCmd);
+							disableCommand = disable_account_defaultCmd;
 						}
 					} else {
 						if (config.getConfig().containsKey("disable.account.trusted")) {
 							disableCommand = config.getString("disable.account.trusted");
 						} else {
 							if (log.isDebugEnabled())
-								log.debug("Can't found disable.account.trusted command, using default:/usr/lbin/modprpw -e...");
-							disableCommand = "/usr/lbin/modprpw -e";
+								log.debug("Can't found disable.account.trusted command, using default:"+disable_account_trusted_defaultCmd);
+							disableCommand = disable_account_trusted_defaultCmd;
 						}
 					}
 
@@ -1983,7 +2012,7 @@ public class HPUXConnector extends AbstractConnector {
 	public Result setPassword(String nativeIdentifier, String newPassword, String currentPassword, Date expiration, Map<String, Object> options) throws ConnectorException, ObjectNotFoundException {
 
 		Result result = new Result();
-
+		
 		Map<String, Object> obj = read(nativeIdentifier, true);
 		if (null == obj) {
 			throw new ObjectNotFoundException(nativeIdentifier);
@@ -2004,14 +2033,13 @@ public class HPUXConnector extends AbstractConnector {
 						passwdCommand = config.getString("change.password");
 					} else {
 						if (log.isDebugEnabled())
-							log.debug("Can't found change.password command, using default:passwd...");
-						passwdCommand = "passwd";
+							log.debug("Can't found change.password command, using default:"+change_password_defaultCmd);
+						passwdCommand = change_password_defaultCmd;
 					}
 
 					// Add nativeIdentifier
 					String executeCommand = passwdCommand + " " + nativeIdentifier;
 					// need to send password to sshCommandExecute
-					// -------------------!!!!
 					sshInteractiveSetPassword(executeCommand, newPassword, currentPassword);
 
 					// Get execution result status
@@ -2028,25 +2056,50 @@ public class HPUXConnector extends AbstractConnector {
 					//
 					// Exeucte each option separately
 					//
+					if(log.isDebugEnabled()) {
+						if(options != null)
+							System.out.println("[Set Password Options]:"+options.toString());
+					}
 					System.out.println("------------------ Set Password Options ----------------");
 					if (options != null) {
 						for (Map.Entry<String, Object> option : options.entrySet()) {
 							String key = option.getKey();
-							String value = (String) option.getValue();
-							System.out.println("Key : " + key + " Value : " + value);
-							String flag = getAttributeMapValue(passwdCommand, "flags", key);
-							if (flag != null) {
-								executeCommand = passwdCommand + " " + flag + " " + value;
-								sshCommandExecute(executeCommand);
-								status = getShellExecutionStatus();
-								if (status != 0) {
-									String errorMsg = getAttributeMapValue(passwdCommand, "exitsts", String.valueOf(status));
-									if (errorMsg == null)
-										errorMsg = "SetPassword account encountered unexcepted error...";
-									result.add(errorMsg);
+							if(option.getValue() instanceof Boolean) {
+								boolean value = (boolean) option.getValue();
+								System.out.println("Key : " + key + " Value : " + value);
+								if(value) {
+									String flag = getAttributeMapValue(passwdCommand, "flags", key);
+									if (flag != null) {
+										executeCommand = passwdCommand + " " + flag + " " + nativeIdentifier;
+										sshCommandExecute(executeCommand);
+										status = getShellExecutionStatus();
+										if (status != 0) {
+											String errorMsg = getAttributeMapValue(passwdCommand, "exitsts", String.valueOf(status));
+											if (errorMsg == null)
+												errorMsg = "SetPassword account encountered unexcepted error...";
+											result.add(errorMsg);
+										}
+									}
+								}
+							}else if(option.getValue() instanceof String) {
+								String value = (String) option.getValue();
+								System.out.println("Key : " + key + " Value : " + value);
+								String flag = getAttributeMapValue(passwdCommand, "flags", key);
+								if (flag != null) {
+									executeCommand = passwdCommand + " " + flag + " " + value + " " + nativeIdentifier;
+									sshCommandExecute(executeCommand);
+									status = getShellExecutionStatus();
+									if (status != 0) {
+										String errorMsg = getAttributeMapValue(passwdCommand, "exitsts", String.valueOf(status));
+										if (errorMsg == null)
+											errorMsg = "SetPassword account encountered unexcepted error...";
+										result.add(errorMsg);
+									}
 								}
 							}
 						}
+					}else {
+						System.out.println("[Set Password Options]: NULL!!!");
 					}
 					System.out.println("----------------------------------------------------------");
 				} else if (OBJECT_TYPE_GROUP.equals(this.objectType)) {
@@ -2066,7 +2119,7 @@ public class HPUXConnector extends AbstractConnector {
 			e.printStackTrace();
 		}
 
-		obj.put(ATTR_PASSWORD, newPassword);
+		obj.put(ATTR_PASSWD, newPassword);
 
 		// expiration is stored in the options map in here
 		if (expiration != null) {
@@ -2109,7 +2162,7 @@ public class HPUXConnector extends AbstractConnector {
 			throw new ObjectNotFoundException(identity);
 		}
 
-		String actualPassword = (String) obj.get(ATTR_PASSWORD);
+		String actualPassword = (String) obj.get(ATTR_PASSWD);
 
 		// If the password matches, check the expiration if there is one.
 		if ((null != actualPassword) && actualPassword.equals(password)) {
@@ -2145,6 +2198,8 @@ public class HPUXConnector extends AbstractConnector {
 			schema.addAttribute(ATTR_UID, Schema.Type.STRING);
 			schema.addAttribute(ATTR_GID, Schema.Type.STRING);
 			schema.addAttribute(ATTR_COMMENT, Schema.Type.STRING);
+			schema.addAttribute(ATTR_HOME, Schema.Type.STRING);
+			schema.addAttribute(ATTR_SHELL, Schema.Type.STRING);
 			schema.addAttribute(ATTR_GROUPS, Schema.Type.STRING);
 			schema.addAttribute(ATTR_PWDLASTCHG, Schema.Type.INT);
 			schema.addAttribute(ATTR_PWDMIN, Schema.Type.INT);
@@ -2167,100 +2222,96 @@ public class HPUXConnector extends AbstractConnector {
 
 	public static void main(String[] args) throws Exception {
 
-		// ConnectorConfig config = new ConnectorConfig();
-		// config.setConfig(new HashMap<String, Object>());
-		// HPUXConnector HPUXConn = new HPUXConnector(config, new
-		// SystemOutLog());
+		//ConnectorConfig config = new ConnectorConfig();
+		//config.setConfig(new HashMap<String, Object>());
+		//HPUXConnector HPUXConn = new HPUXConnector(config, new SystemOutLog());
 
-		// Schema schema = new Schema();
-		// schema.setObjectType(OBJECT_TYPE_ACCOUNT);
-		// schema.setIdentityAttribute(ATTR_USERNAME);
-		// config.addSchema(schema);
+		//Schema schema = new Schema();
+		//schema.setObjectType(OBJECT_TYPE_ACCOUNT);
+		//schema.setIdentityAttribute(ATTR_USERNAME);
+		//config.addSchema(schema);
+		
+		//
+		// Below testing is for self testing during Eclipse Developing Status
+		//
+		
+		//startTest("----------------- Initial State --------------------");
+		
+		//startTest("TestConnection");
+		//HPUXConn.testConnection();
+		//dump();
 
-		// TODO: example of a few config parameters ... a transformer of some
-		// flavor (ie - java interface) to show how to implement hooks, a
-		// boolean, an int, and a string?
+		//startTest("isAccountExists");
+		//boolean res = HPUXConn.isAccountExists(testAcc);
+		//System.out.println(res);
 
-		// HPUXConnector conn = new HPUXConnector(config, new SystemOutLog());
-		// startTest("Initial state");
-		// startTest("TestConnection");
-		// HPUXConn.testConnection();
-		// dump();
-
-		// startTest("isAccountExists");
-		// boolean res = HPUXConn.isAccountExists("testing223");
-		// System.out.println(res);
-
-		// startTest("Read()");
-		// Map<String, Object> testing = HPUXConn.read("testing");
-
-		// startTest("Iterate()");
-		// HPUXConn.iterate(new Filter());
-		// startTest("Set Password");
-		// HPUXConn.setPassword("uattest02", "newpassword123", "newpassword",
-		// null, null);
-		// dump();
-		// System.out.println("Read jdoe: " + testing);
-		// startTest("Create"); List<Item> items = new ArrayList<Item>();
-		// items.add(new Item(ATTR_FIRSTNAME, "new")); items.add(new
-		/*
-		 * Item(ATTR_LASTNAME, "USER")); items.add(new Item(ATTR_EMAIL,
-		 * "new.user@example.com")); items.add(new Item(ATTR_PASSWORD,
-		 * "secret2")); List<String> groups = new ArrayList<String>();
-		 * groups.add("group2"); items.add(new Item(ATTR_GROUPS, groups));
-		 * 
-		 * conn.create("newuser", items); dump();
-		 * 
-		 * startTest("Read"); Map<String, Object> jdoe = conn.read("jdoe");
-		 * System.out.println("Read jdoe: " + jdoe);
-		 * 
-		 * startTest("Iterate"); Iterator<Map<String, Object>> it =
-		 * conn.iterate((Filter) null); while (it.hasNext()) {
-		 * System.out.println(it.next()); }
-		 * 
-		 * startTest("Iterate with filter"); Filter f = new Filter();
-		 * f.add(ATTR_USERNAME, Filter.Operator.STARTS_WITH, "j"); it =
-		 * conn.iterate(f); while (it.hasNext()) {
-		 * System.out.println(it.next()); }
-		 * 
-		 * startTest("Update"); items = new ArrayList<Item>(); items.add(new
-		 * Item(ATTR_LASTNAME, "Reilly")); conn.update("jdoe", items); dump();
-		 * 
-		 * startTest("Update with UpdateOptions"); items = new
-		 * ArrayList<Item>(); items.add(new Item(ATTR_FIRSTNAME, "Bruce"));
-		 * items.add(new Item(ATTR_LASTNAME, "Lee")); List<String> toAdd = new
-		 * ArrayList<String>(); toAdd.add("foo"); toAdd.add("bar");
-		 * items.add(new Item(ATTR_GROUPS, Item.Operation.Add, toAdd));
-		 * List<String> toRemove = new ArrayList<String>();
-		 * toRemove.add("group2"); items.add(new Item(ATTR_GROUPS,
-		 * Item.Operation.Remove, toRemove)); conn.update("jdoe", items);
-		 * dump();
-		 * 
-		 * startTest("Delete"); conn.delete("jdoe", null); dump();
-		 * 
-		 * startTest("Disable"); conn.disable("jsmith", null); dump();
-		 * 
-		 * startTest("Enable"); conn.enable("jsmith", null); dump();
-		 * 
-		 * startTest("Unlock"); conn.unlock("jsmith", null); dump();
-		 * 
-		 * startTest("Set Password"); conn.setPassword("jsmith", "newpassword",
-		 * "secret", null, null); dump();
-		 * 
-		 * startTest("Authenticate"); Map<String, Object> authenticated =
-		 * conn.authenticate("jsmith", "newpassword");
-		 * System.out.println(authenticated);
-		 * 
-		 * startTest("Authenticate with expiration"); Date expiration = new
-		 * Date(System.currentTimeMillis() + 50); conn.setPassword("jsmith",
-		 * "secret", "newpassword", expiration, null); Thread.sleep(100); try {
-		 * authenticated = conn.authenticate("jsmith", "newpassword");
-		 * System.out .println(
-		 * "PROBLEM!!  Authenticating with expired password should have failed."
-		 * ); } catch (ExpiredPasswordException e) { System.out
-		 * .println("Authenticating with expired password did not allow access: "
-		 * + e.getMessage()); }
-		 */
+		//startTest("Iterate");
+		//HPUXConn.iterate(new Filter());
+		
+		//startTest("Iterate"); Iterator<Map<String, Object>> it =
+		//conn.iterate((Filter) null); while (it.hasNext()) {
+		//System.out.println(it.next()); }
+		 
+		//startTest("Iterate with filter"); Filter f = new Filter();
+		//f.add(ATTR_USERNAME, Filter.Operator.STARTS_WITH, "j"); it =
+		//conn.iterate(f);
+		//while (it.hasNext()) {
+			//System.out.println(it.next()); 
+		//}
+		
+		
+		//String newAcc = "test2";
+		//startTest("Create"); 
+		//List<Item> items = new ArrayList<Item>();
+		//items.add(new Item(ATTR_PASSWD, "abc123")); 
+		//items.add(newItem(ATTR_LASTNAME, "USER")); 
+		//items.add(new Item(ATTR_EMAIL,"new.user@example.com")); 
+		//items.add(new Item(ATTR_PASSWORD,"secret2")); 
+		//List<String> groups = new ArrayList<String>();
+		//groups.add("group2"); 
+		//items.add(new Item(ATTR_GROUPS, groups));
+		//HPUXConn.create(newAcc, items); 
+		//dump();
+		  
+		//startTest("Read");
+		//Map<String, Object> testing = HPUXConn.read(newAcc);
+		
+		//startTest("Disable"); 
+		//HPUXConn.disable(newAcc, null); 
+		//dump();
+		
+		//startTest("Enable"); 
+		//HPUXConn.enable(newAcc, null); 
+		//dump();
+		
+		//startTest("SetPassword");
+		//HPUXConn.setPassword(newAcc, "abc456", null, null, null);
+		
+		//startTest("Update"); 
+		//items = new ArrayList<Item>(); 
+		//items.add(new Item(ATTR_SHELL, "/bin/sh")); 
+		//HPUXConn.update(newAcc, items); 
+		//dump();
+		 
+		//startTest("Delete"); 
+		//HPUXConn.delete(newAcc, null); 
+		//dump();
+		 
+		//startTest("Unlock"); 
+		//conn.unlock(newAcc, null); 
+		//dump();
+		 
+		//startTest("Authenticate"); 
+		//Map<String, Object> authenticated = conn.authenticate(newAcc, "abc456");
+		 
+		//startTest("Authenticate with expiration"); 
+		//Date expiration = new Date(System.currentTimeMillis() + 50); 
+		//conn.setPassword(newAcc,"secret", "newpassword", expiration, null); 
+		//Thread.sleep(100); 
+		//try {authenticated = conn.authenticate("jsmith", "newpassword");
+		//System.out .println("PROBLEM!!  Authenticating with expired password should have failed."); } 
+		//catch (ExpiredPasswordException e) { System.out.println("Authenticating with expired password did not allow access: "+ e.getMessage()); }
+		
 	}
 
 	private static boolean firstTest = true;
