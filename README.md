@@ -18,8 +18,8 @@ Following Rights are needed with root privilege:
 
 ```
 /bin/chmod, /usr/sbin/useradd, /usr/sbin/usermod, /usr/sbin/userdel, /usr/sbin/groupadd, /usr/sbin/groupmod,
-/usr/sbin/groupdel, /usr/bin/passwd, /usr/bin/last, /usr/bin/groups, /bin/rm, /bin/echo, /usr/bin/chage,
-/usr/bin/find, /bin/cat /etc/shadow, /bin/cat /etc/passwd, /bin/cat /etc/group, /usr/bin/etc/pwget, /usr/bin/grget, 
+/usr/sbin/groupdel, /usr/bin/passwd, /usr/bin/last, /usr/bin/groups, /bin/rm, /bin/echo, 
+/usr/bin/find, /bin/cat /etc/shadow, /bin/cat /etc/passwd, /bin/cat /etc/group, /usr/bin/etc/pwget, /usr/lbin/getprpw
 /bin/grep, /usr/bin/awk, /user/bin/id, /usr/sbin/userdbset, /usr/lbin/modprpw, /usr/sbin/userstat
 ```
 
@@ -28,13 +28,26 @@ An entry in /etc/sudoers file should look similar to the following:
 
 ```
 username ALL = (root) PASSWD:/bin/chmod, /usr/sbin/useradd, /usr/sbin/usermod, /usr/sbin/userdel, /usr/sbin/groupadd,
-/usr/sbin/groupmod, /usr/sbin/groupdel, /usr/bin/passwd, /usr/bin/last, /usr/bin/groups, /bin/rm, /bin/echo, /usr/bin/chage,
-/usr/bin/find, /bin/cat /etc/shadow, /bin/cat /etc/passwd, /bin/cat /etc/group, /usr/bin/etc/pwget, /usr/bin/grget, 
+/usr/sbin/groupmod, /usr/sbin/groupdel, /usr/bin/passwd, /usr/bin/last, /usr/bin/groups, /bin/rm, /bin/echo, 
+/usr/bin/find, /bin/cat /etc/shadow, /bin/cat /etc/passwd, /bin/cat /etc/group, /usr/bin/etc/pwget, /usr/lbin/getprpw 
 /bin/grep, /usr/bin/awk, /user/bin/id, /usr/sbin/userdbset, /usr/lbin/modprpw, /usr/sbin/userstat
 ```
 ### Installing
 
 ### Support Features
+AUTHENTICATE: NO
+CREATE: SUPPORT (TESTED)
+DELETE: SUPPORT (TESTED)
+DISCOVER_SCHEMA: NO
+DISABLE: SUPPORT (Disable with clear password)
+ENABLE: SUPPORT (Enable with reset default password workaround)
+READ: SUPPORT (Manage Account Refresh with issue)
+GET: SUPPORT
+ITERATE: SUPPORT
+PERMISSIONS: NO
+SET_PASSWORD: SUPPORT
+UNLOCK: SUPPORT
+UPDATE: SUPPORT
 
 ### Shadow Utility
 Unlike Linux system, by default, HP-UX Basic mode doesn't contain shadow utility, this usually cause error while we try to use Linux - Direct connector to do provisioning on HP-UX systems. The /etc/passwd file format is basic the same as other unix/linux systems: 
@@ -50,6 +63,19 @@ The major difference is the encrypted password field, normally for Linux system 
 Another difference is that the password aging for basic mode is implemented by appending comma with a non-null string at the end of the encrypted password field. The first character of age, M, indicates the maximum number of weeks of valid password. User attempt to login with an expired password will be forced to submit a new password. The next character, m, indicates the minimum period in weeks that must expire before the password can be changed. The remaining two characters define the week when the password was last changed (a null string is equivalent to zero).
  
 In order to enhance security, we can use pwconv command to convert the /etc/passwd encrypted password field to /etc/shadow format. If /etc/shadow not exists it will generate a new one. If the password aging information exists it will also be moved to shadow file. The /etc/passwd encrypted password field will be replaces with 'x' in each /etc/passwd entries.
+
+### Password Aging Information
+With no shadow file and untrusted mode, instead, HP-UX stored password-related information in the /etc/passwd password aging information in the password field.
+
+Inside password field, aging information comes with a comma and followed up with a non-null string. Normally there are 4 digits followed by the comma, the characters for each digit represent a different value. '.' stands of 0,'/' for 1, '0-9' represent 2-11, 'A-Z' represent 12-37, 'a-z' represent 38-63. There are total 64-character set for each digit.
+
+The first digit M in the aging information is the maximum number of weeks which password is valid; the second digit m is the minimum period of weeks before the password can be changed. The last two digits represent the week when password last changed. Note: password warning time is not available with untrusted system, unless change to trusted system or equipped with shadow utility.
+E.g.
+test:QivQg0wjFWQf6,7.3b:109:20::/home/test:/sbin/sh
+In above entry, we find "7.3b" after the comma inside the password field.
+7 represents M (pwdmax) in 64-character set map to value 9, means 9 maximum weeks which password is valid.
+'.' represents m (pwdmin) in 64-character set map to value 0.
+3b represents the last password change time.
 
 #### Compile
 
